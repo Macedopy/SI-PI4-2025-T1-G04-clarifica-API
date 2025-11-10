@@ -23,9 +23,9 @@ public class UserService {
     }
 
     @Transactional
-    public Optional<UserDTO> customerById(String id) {
-        User user = repository.findByIdOptional(id);
-        return user != null ? Optional.of(mapToDTO(user)) : Optional.empty();
+    public UserDTO customerById(String id) {
+        User user = userRepository.findByIdOptional(id);
+        return user;
     }
 
     private UserDTO mapToDTO(User user) {

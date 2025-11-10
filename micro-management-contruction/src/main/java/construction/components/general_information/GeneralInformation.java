@@ -1,24 +1,21 @@
-package construction.user;
+package construction.components.general_information;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import construction.components.general.Topography;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
-@Entity
-@Table(name = "users")
-public class User extends PanacheEntityBase {
+public class GeneralInformation extends PanacheEntityBase{
     @Id
     private String id;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @Column(name = "localization", nullable = false)
+    private String localization;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    @Column(name = "topography", nullable = false)
+    private Topography topography;
 
     @Email(message = "Invalid email format")
     @Column(nullable = false, unique = true)

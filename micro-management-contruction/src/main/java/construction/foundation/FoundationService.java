@@ -1,4 +1,4 @@
-package construction.user;
+package construction.foundation;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,12 +10,12 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
-public class UserService {
+public class FoundationService {
     @Inject
-    UserRepository userRepository;
+    FoundationRepository userRepository;
 
     @Transactional
-    public List<UserDTO> allCustomers() {
+    public List<FoundationDTO> allCustomers() {
         return userRepository.findAllCustomers()
         .stream()
         .map(this::mapToDTO)
@@ -23,15 +23,15 @@ public class UserService {
     }
 
     @Transactional
-    public Optional<UserDTO> customerById(String id) {
-        User user = repository.findByIdOptional(id);
-        return user != null ? Optional.of(mapToDTO(user)) : Optional.empty();
+    public FoundationDTO customerById(String id) {
+        Foundation user = userRepository.findByIdOptional(id);
+        return user;
     }
 
-    private UserDTO mapToDTO(User user) {
-        return new UserDTO(
+    private FoundationDTO mapToDTO(Foundation user) {
+        return new FoundationDTO(
             user.getId(),
-            new UserDTO.PII(
+            new FoundationDTO.PII(
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),

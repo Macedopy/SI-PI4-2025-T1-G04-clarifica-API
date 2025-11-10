@@ -1,17 +1,17 @@
-package construction.user;
+package construction.foundation;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public class UserRepository implements PanacheRepository<User> {
+public class FoundationRepository implements PanacheRepository<Foundation> {
     
-    public List<User> findAllCustomers() {
+    public List<Foundation> findAllCustomers() {
         return listAll();
     }
     
-    public User findByIdOptional(String id) {
+    public Foundation findByIdOptional(String id) {
         return find("id", id).firstResult();
     }
 }
