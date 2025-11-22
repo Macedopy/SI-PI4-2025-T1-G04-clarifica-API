@@ -32,11 +32,13 @@ public class FoundationMachineryService {
 
         for (MachineryDTO dto : dtos) {
             FoundationMachinery entity = mapToEntity(dto);
-            if (dto.getId() == null || dto.getId().isBlank()) {
-                entity.setId(UUID.randomUUID().toString());
+            String idToUse;
+            if (dto.getId() != null && !dto.getId().isBlank()) {
+                idToUse = dto.getId();
             } else {
-                entity.setId(dto.getId());
+                idToUse = UUID.randomUUID().toString();
             }
+            entity.setId(idToUse);
             entity.setPhaseId(phaseId);
             entity.setFoundation(foundation);
 
@@ -48,7 +50,11 @@ public class FoundationMachineryService {
         FoundationMachinery entity = new FoundationMachinery();
 
         entity.setName(dto.getName());
-        entity.setCategory(dto.getCategory());
+        String category = dto.getCategory();
+        if (category == null || category.isBlank()) {
+            category = "OTHER";  // default category
+        }
+        entity.setCategory(category);
 
         entity.setTotalQuantity(dto.getTotalQuantity());
         entity.setInOperation(dto.getInOperation());
@@ -59,14 +65,12 @@ public class FoundationMachineryService {
         
         if (dto.getFuelUnit() != null) {
             entity.setFuelUnit(FuelUnit.valueOf(dto.getFuelUnit().toUpperCase()));
-        } else {
-             throw new IllegalArgumentException("Fuel unit cannot be null.");
         }
         
-        if (dto.getCondition() != null) {
+        if (dto.getCondition() != null && !dto.getCondition().isBlank()) {
             entity.setCondition(Condition.valueOf(dto.getCondition().toUpperCase()));
         } else {
-             throw new IllegalArgumentException("Condition cannot be null.");
+            entity.setCondition(Condition.GOOD); // default condition
         }
         
         entity.setNotes(dto.getNotes());

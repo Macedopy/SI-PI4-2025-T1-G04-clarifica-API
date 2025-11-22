@@ -27,7 +27,13 @@ public class FoundationMaterialService {
 
         for (MaterialDTO dto : dtos) {
             FoundationMaterial entity = mapToEntity(dto);
-            entity.setId(dto.getId() != null && !dto.getId().isBlank() ? dto.getId() : UUID.randomUUID().toString());
+            String idToUse;
+            if (dto.getId() != null && !dto.getId().isBlank()) {
+                idToUse = dto.getId();
+            } else {
+                idToUse = UUID.randomUUID().toString();
+            }
+            entity.setId(idToUse);
             entity.setPhaseId(phaseId);
             entity.setFoundation(foundation);
 

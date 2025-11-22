@@ -22,11 +22,9 @@ public class FoundationMachinery extends PanacheEntityBase {
     @Transient
     private String phaseId;
 
-    @NotBlank(message = "Name is required")
     @Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "Category is required")
     @Column(nullable = false)
     private String category;
 
@@ -43,7 +41,6 @@ public class FoundationMachinery extends PanacheEntityBase {
     private FuelUnit fuelUnit;
 
     @Column(name = "total_quantity", nullable = false)
-    @Min(1)
     private int totalQuantity = 1;
 
     @Column(name = "in_operation", nullable = false)
