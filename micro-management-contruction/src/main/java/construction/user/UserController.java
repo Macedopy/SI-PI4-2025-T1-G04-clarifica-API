@@ -29,7 +29,7 @@ public class UserController {
 
     @GET
     @Path("/customer/{id}")
-    public Response customerById(@PathParam(value = id) String id) {
+    public Response customerById(@PathParam("id") String id) {
         try
         {
             UserDTO user = userService.customerById(id);

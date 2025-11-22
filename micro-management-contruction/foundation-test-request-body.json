@@ -1,0 +1,63 @@
+{
+  "phaseName": "Foundation Block Main Phase",
+  "contractor": "Construtora Exemplo Ltda.",
+  "equipe": [
+    {
+      "id": "1",
+      "name": "João Silva",
+      "role": "Supervisor",
+      "cpf": "111.222.333-44",
+      "hoursWorked": 40.5,
+      "status": "PRESENT",
+      "notes": "Excelente liderança"
+    }
+  ],
+  "servicos": [
+    {
+      "id": "1",
+      "name": "Escavação",
+      "hoursWorked": 120.0,
+      "status": "COMPLETED",
+      "notes": "Escavação concluída conforme plano"
+    }
+  ],
+  "maquinarios": [
+    {
+      "id": "1",
+      "name": "Escavadeira Hidráulica",
+      "category": "Máquinas Pesadas",
+      "hoursWorked": 75.5,
+      "fuelUsed": 100.0,
+      "fuelUnit": "LITERS",
+      "totalQuantity": 5,
+      "inOperation": 4,
+      "inMaintenance": 0,
+      "condition": "GOOD",
+      "notes": "Funcionando sem problemas"
+    }
+  ],
+  "materiais": [
+    {
+      "id": "1",
+      "name": "Cimento Portland",
+      "quantity": 1000,
+      "unit": "kg",
+      "notes": "Usado para concretagem"
+    }
+  ],
+  "ferramentas": [
+    {
+      "id": "1",
+      "name": "Nível a laser",
+      "condition": "NEW",
+      "notes": "Ferramenta nova em uso"
+    }
+  ],
+  "fotos": [
+    {
+      "id": "1",
+      "url": "http://example.com/photos/fundacao-inicial.jpg",
+      "description": "Foto da fundação no início do projeto"
+    }
+  ]
+}

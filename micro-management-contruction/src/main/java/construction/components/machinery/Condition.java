@@ -1,10 +1,13 @@
-public package construction.machinery;
+package construction.components.machinery;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Condition {
-    EXCELLENT("ótima"),
+    EXCELLENT("otima"),
     GOOD("boa"),
     POOR("ruim"),
-    UNAVAILABLE("indisponível");
+    UNAVAILABLE("indisponivel");
 
     private final String displayName;
 
@@ -17,14 +20,13 @@ public enum Condition {
         return displayName;
     }
 
-    public static Condition fromDisplayName(String name) {
+    @JsonCreator
+    public static Condition fromString(String value) {
+        if (value == null) return null;
         for (Condition c : values()) {
-            if (c.displayName.equalsIgnoreCase(name)) {
-                return c;
-            }
+            if (c.displayName.equalsIgnoreCase(value)) return c;
         }
-        return GOOD;
+        try { return Condition.valueOf(value.toUpperCase()); }
+        catch (Exception e) { return GOOD; }
     }
-} {
-    
 }

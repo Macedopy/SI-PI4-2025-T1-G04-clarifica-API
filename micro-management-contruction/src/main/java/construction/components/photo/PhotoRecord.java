@@ -1,4 +1,4 @@
-package construction.photo;
+package construction.components.photo;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -10,9 +10,6 @@ public class PhotoRecord extends PanacheEntityBase {
 
     @Id
     private String id;
-
-    @Column(name = "phase_id", nullable = false)
-    private String phaseId;
 
     @NotBlank(message = "File path or URL is required")
     @Column(name = "file_path", nullable = false, length = 1000)
@@ -34,14 +31,6 @@ public class PhotoRecord extends PanacheEntityBase {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(String phaseId) {
-        this.phaseId = phaseId;
     }
 
     public String getFilePath() {

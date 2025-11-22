@@ -1,12 +1,15 @@
 package construction.components.used_material;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum MaterialCategory {
     CEMENT("Cimento"),
     SAND("Areia"),
     STEEL("Ferro"),
     BRICK("Tijolo"),
     WOOD("Madeira"),
-    ELECTRICAL("Elétrica"),
+    ELECTRICAL("Eletrica"),
     PLUMBING("Hidráulica"),
     OTHER("Outros");
 
@@ -16,17 +19,21 @@ public enum MaterialCategory {
         this.displayName = displayName;
     }
 
+    @JsonValue
     public String getDisplayName() {
         return displayName;
     }
 
-    // Permite buscar pelo nome em português (ex: "Cimento")
-    public static MaterialCategory fromDisplayName(String name) {
-        for (MaterialCategory cat : values()) {
-            if (cat.displayName.equalsIgnoreCase(name)) {
-                return cat;
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static MaterialCategory fromValue(String value) {
+        if (value == null || value.isEmpty()) {
+            return OTHER;
+        }
+        for (MaterialCategory c : values()) {
+            if (c.displayName.equalsIgnoreCase(value.trim())) {
+                return c;
             }
         }
-        return OTHER;
+        return OTHER; // fallback seguro
     }
 }

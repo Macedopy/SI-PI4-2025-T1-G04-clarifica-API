@@ -1,4 +1,7 @@
-package construction.machinery;
+package construction.components.machinery;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum FuelUnit {
     LITERS("litros"),
@@ -15,12 +18,13 @@ public enum FuelUnit {
         return displayName;
     }
 
-    public static FuelUnit fromDisplayName(String name) {
-        for (FuelUnit unit : values()) {
-            if (unit.displayName.equalsIgnoreCase(name)) {
-                return unit;
-            }
+    @JsonCreator
+    public static FuelUnit fromString(String value) {
+        if (value == null) return null;
+        for (FuelUnit u : values()) {
+            if (u.displayName.equalsIgnoreCase(value)) return u;
         }
-        return LITERS;
+        try { return FuelUnit.valueOf(value.toUpperCase()); }
+        catch (Exception e) { return LITERS; }
     }
 }

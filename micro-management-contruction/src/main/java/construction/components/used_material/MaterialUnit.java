@@ -1,5 +1,8 @@
 package construction.components.used_material;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum MaterialUnit {
     BAG("saco"),
     KG("kg"),
@@ -13,16 +16,18 @@ public enum MaterialUnit {
         this.symbol = symbol;
     }
 
+    @JsonValue
     public String getSymbol() {
         return symbol;
     }
 
-    public static MaterialUnit fromSymbol(String symbol) {
-        for (MaterialUnit unit : values()) {
-            if (unit.symbol.equalsIgnoreCase(symbol)) {
-                return unit;
-            }
+    @JsonCreator
+    public static MaterialUnit fromString(String value) {
+        if (value == null) return null;
+        for (MaterialUnit u : values()) {
+            if (u.symbol.equalsIgnoreCase(value)) return u;
         }
-        return UNIT; // fallback
+        try { return MaterialUnit.valueOf(value.toUpperCase().replace("³", "IC_METER")); }
+        catch (Exception e) { return UNIT; }
     }
 }

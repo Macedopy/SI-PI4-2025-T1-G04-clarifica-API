@@ -1,4 +1,4 @@
-package construction.machinery;
+package construction.components.machinery;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -116,7 +116,7 @@ public class Machinery extends PanacheEntityBase {
         return fuelUnit;
     }
 
-    public void setFuel(litros) {
+    public void setFuel(FuelUnit litros) {
         this.fuelUnit = fuelUnit;
     }
 

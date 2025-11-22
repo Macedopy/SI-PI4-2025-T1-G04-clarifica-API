@@ -1,5 +1,8 @@
 package construction.components.team_present;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum MemberStatus {
     PRESENT("presente"),
     ABSENT("ausente"),
@@ -11,16 +14,18 @@ public enum MemberStatus {
         this.displayName = displayName;
     }
 
+    @JsonValue
     public String getDisplayName() {
         return displayName;
     }
 
-    public static MemberStatus fromDisplayName(String name) {
+    @JsonCreator
+    public static MemberStatus fromString(String value) {
+        if (value == null) return null;
         for (MemberStatus s : values()) {
-            if (s.displayName.equalsIgnoreCase(name)) {
-                return s;
-            }
+            if (s.displayName.equalsIgnoreCase(value)) return s;
         }
-        return PRESENT;
+        try { return MemberStatus.valueOf(value.toUpperCase()); }
+        catch (Exception e) { return PRESENT; }
     }
 }

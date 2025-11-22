@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.smallrye.common.constraint.NotNull;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException; // Necessário para tratamento de erro 404
 
 @ApplicationScoped
 public class UserService {
@@ -24,8 +24,9 @@ public class UserService {
 
     @Transactional
     public UserDTO customerById(String id) {
-        User user = userRepository.findByIdOptional(id);
-        return user;
+        return userRepository.findByIdOptional(id)
+            .map(this::mapToDTO) // Mapeia User para UserDTO
+            .orElseThrow(() -> new NotFoundException("Cliente com ID " + id + " não encontrado."));
     }
 
     private UserDTO mapToDTO(User user) {

@@ -12,9 +12,6 @@ public class ExecutedService extends PanacheEntityBase {
     @Id
     private String id;
 
-    @Column(name = "phase_id", nullable = false)
-    private String phaseId;
-
     @NotBlank(message = "Name is required")
     @Column(nullable = false)
     private String name;
@@ -48,14 +45,6 @@ public class ExecutedService extends PanacheEntityBase {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(String phaseId) {
-        this.phaseId = phaseId;
     }
 
     public String getName() {

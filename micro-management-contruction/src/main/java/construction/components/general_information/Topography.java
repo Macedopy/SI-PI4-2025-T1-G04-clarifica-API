@@ -1,5 +1,8 @@
 package construction.components.general_information;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum Topography {
     FLAT("plana"),
     SLOPED("inclinada"),
@@ -12,16 +15,18 @@ public enum Topography {
         this.displayName = displayName;
     }
 
+    @JsonValue
     public String getDisplayName() {
         return displayName;
     }
 
-    public static Topography fromDisplayName(String name) {
+    @JsonCreator
+    public static Topography fromString(String value) {
+        if (value == null) return null;
         for (Topography t : values()) {
-            if (t.displayName.equalsIgnoreCase(name)) {
-                return t;
-            }
+            if (t.displayName.equalsIgnoreCase(value)) return t;
         }
-        return FLAT;
+        try { return Topography.valueOf(value.toUpperCase()); }
+        catch (Exception e) { return FLAT; }
     }
 }

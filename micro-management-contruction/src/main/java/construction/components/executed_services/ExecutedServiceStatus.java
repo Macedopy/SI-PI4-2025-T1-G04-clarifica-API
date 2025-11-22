@@ -1,11 +1,17 @@
 package construction.components.executed_services;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ExecutedServiceStatus {
     PLANNED("planejado"),
     STARTED("iniciado"),
     IN_PROGRESS("andamento"),
-    COMPLETED("concluido");
+    COMPLETED("concluido"),
+    CONCLUIDO("concluido"),
+    EM_ANDAMENTO("andamento"),
+    PLANEJADO("planejado"),
+    INICIADO("iniciado");
 
     private final String displayName;
 
@@ -13,16 +19,22 @@ public enum ExecutedServiceStatus {
         this.displayName = displayName;
     }
 
+    @JsonValue
     public String getDisplayName() {
         return displayName;
     }
 
-    public static ExecutedServiceStatus fromDisplayName(String name) {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static ExecutedServiceStatus fromValue(String value) {
+        if (value == null) return null;
+
+        // Aceita: "concluido", "CONCLUIDO", "COMPLETED", "concluído", etc
         for (ExecutedServiceStatus s : values()) {
-            if (s.displayName.equalsIgnoreCase(name)) {
+            if (s.displayName.equalsIgnoreCase(value) || 
+                s.name().equalsIgnoreCase(value.replace(" ", "_"))) {
                 return s;
             }
         }
-        return PLANNED;
+        return PLANNED; // fallback
     }
 }

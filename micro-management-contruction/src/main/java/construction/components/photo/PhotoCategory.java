@@ -1,5 +1,6 @@
-package construction.photo;
+package construction.components.photo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum PhotoCategory {
@@ -20,12 +21,13 @@ public enum PhotoCategory {
         return displayName;
     }
 
-    public static PhotoCategory fromDisplayName(String name) {
-        for (PhotoCategory cat : values()) {
-            if (cat.displayName.equalsIgnoreCase(name)) {
-                return cat;
-            }
+    @JsonCreator
+    public static PhotoCategory fromString(String value) {
+        if (value == null) return null;
+        for (PhotoCategory c : values()) {
+            if (c.displayName.equalsIgnoreCase(value)) return c;
         }
-        return PROGRESS;
+        try { return PhotoCategory.valueOf(value.toUpperCase()); }
+        catch (Exception e) { return PROGRESS; }
     }
 }
