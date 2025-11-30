@@ -1,12 +1,14 @@
 package construction.user;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import jakarta.enterprise.context.ApplicationScoped;
+
 @ApplicationScoped
-public class UserRepository implements PanacheRepositoryBase<User, String> { 
+public class UserRepository implements PanacheRepositoryBase<User, String> {
+
     public List<User> findAllCustomers() {
-        return listAll(); 
+        return find("role", UserRole.CLIENT).list();
     }
 }

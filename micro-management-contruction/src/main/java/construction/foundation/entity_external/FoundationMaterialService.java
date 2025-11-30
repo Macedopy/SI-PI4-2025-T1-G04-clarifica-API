@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors; // Adicionado para o stream
 
 @ApplicationScoped
 public class FoundationMaterialService {
@@ -18,32 +19,13 @@ public class FoundationMaterialService {
     @Inject FoundationMaterialRepository foundationMaterialRepository;
     @Inject FoundationRepository foundationRepository;
 
-    @Transactional
-    public void saveAll(List<MaterialDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) return;
-
-        Foundation foundation = foundationRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Foundation não encontrada com ID: " + phaseId));
-
-        for (MaterialDTO dto : dtos) {
-            FoundationMaterial entity = mapToEntity(dto);
-            String idToUse;
-            if (dto.getId() != null && !dto.getId().isBlank()) {
-                idToUse = dto.getId();
-            } else {
-                idToUse = UUID.randomUUID().toString();
-            }
-            entity.setId(idToUse);
-            entity.setPhaseId(phaseId);
-            entity.setFoundation(foundation);
-
-            System.out.println("Persistindo material: " + entity.getId() + " - " + entity.getName());
-            foundationMaterialRepository.persist(entity);
-        }
-    }
-
-    private FoundationMaterial mapToEntity(MaterialDTO dto) {
+    private FoundationMaterial mapToEntity(MaterialDTO dto, String phaseId, Foundation foundation) {
         FoundationMaterial entity = new FoundationMaterial();
+
+        entity.setId(UUID.randomUUID().toString());
+
+        entity.setPhaseId(phaseId);
+        entity.setFoundation(foundation);
 
         // FIX DEFINITIVO: nunca mais null ou vazio
         entity.setName(
@@ -80,5 +62,21 @@ public class FoundationMaterialService {
         entity.updateRestockStatus();
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<MaterialDTO> dtos, String phaseId) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        Foundation foundation = foundationRepository.findByIdOptional(phaseId)
+            .orElseThrow(() -> new NotFoundException("Foundation não encontrada com ID: " + phaseId));
+
+        List<FoundationMaterial> entities = dtos.stream()
+            // Passa os dados de contexto e a DTO para mapeamento
+            .map(dto -> mapToEntity(dto, phaseId, foundation))
+            .collect(Collectors.toList());
+
+        // Panache fará o UPSET (update ou insert) em lote.
+        FoundationMaterial.persist(entities);
     }
 }

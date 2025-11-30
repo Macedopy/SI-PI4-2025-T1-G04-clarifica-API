@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class FoundationTeamMemberService {
@@ -21,44 +22,34 @@ public class FoundationTeamMemberService {
     @Inject
     FoundationRepository foundationRepository;
 
-    @Transactional
-    public void saveAll(List<TeamMemberDTO> memberDTOs, String phaseId) {
-        
-        if (memberDTOs == null || memberDTOs.isEmpty()) {
-            return;
-        }
-
-        Foundation foundation = foundationRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Foundation não encontrada com ID: " + phaseId));
-
-        for (TeamMemberDTO dto : memberDTOs) {
-            FoundationTeamMember entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString()); 
-            entity.setPhaseId(phaseId);
-            entity.setFoundation(foundation);
-            
-            System.out.println("Persistindo membro: " + entity.getId() + " - " + entity.getDetails().getName());
-            teamMemberRepository.persist(entity);
-        }
-    }
-
-    private FoundationTeamMember mapDtoToEntity(TeamMemberDTO dto) {
+    private FoundationTeamMember mapToEntity(TeamMemberDTO dto, String phaseId, Foundation foundation) {
         FoundationTeamMember entity = new FoundationTeamMember();
-        TeamMemberDetails details = new TeamMemberDetails();
-        
-        String name = dto.getName();
-        if (name == null || name.trim().isEmpty()) {
-            name = "Membro sem identificação";
-        }
-        details.setName(name.trim());
-        details.setRole(dto.getRole() != null ? dto.getRole().trim() : "Não informado");
-        details.setCpf(dto.getCpf());
 
-        entity.setDetails(details); 
+        entity.setId(UUID.randomUUID().toString());
+
+        entity.setPhaseId(phaseId);
+        entity.setFoundation(foundation);
+        
+        if (entity.getDetails() == null) {
+            entity.setDetails(new TeamMemberDetails());
+        }
+
+        entity.getDetails().setName(dto.getName());
+        entity.getDetails().setRole(dto.getRole());
         entity.setHoursWorked(dto.getHoursWorked());
-        entity.setStatus(dto.getStatus() != null ? dto.getStatus() : MemberStatus.PRESENT);
-        entity.setNotes(dto.getNotes());
+        entity.setStatus(dto.getStatus() != null ? (dto.getStatus()) : MemberStatus.ON_LEAVE);
         
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<TeamMemberDTO> dtos, String phaseId, Foundation foundation) {
+        if (dtos == null) return;
+
+        List<FoundationTeamMember> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, foundation))
+            .collect(Collectors.toList());
+
+        FoundationTeamMember.persist(entities);
     }
 }

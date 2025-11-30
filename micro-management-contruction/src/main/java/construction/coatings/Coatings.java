@@ -6,11 +6,14 @@ import construction.coatings.entity_external.CoatingsMaterial;
 import construction.coatings.entity_external.CoatingsPhotoRecord;
 import construction.coatings.entity_external.CoatingsTeamMember;
 import construction.coatings.entity_external.CoatingsTool;
+import construction.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "coatings")
@@ -24,6 +27,10 @@ public class Coatings extends PanacheEntityBase {
 
     @Column(name = "contractor")
     private String contractor;
+
+    @OneToOne
+    @JoinColumn(name = "user_id") 
+    private User user;
 
     @OneToMany(mappedBy = "coatings", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CoatingsMaterial> materials = new ArrayList<>();
@@ -46,6 +53,14 @@ public class Coatings extends PanacheEntityBase {
     public Coatings() {
         // Garante que o ID seja gerado se não existir
         this.id = UUID.randomUUID().toString();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getId() {

@@ -32,12 +32,7 @@ public class FoundationPhotoRecordService {
         
         for (PhotoRecordDTO dto : dtos) {
             FoundationPhotoRecord entity = mapToEntity(dto);
-            
-            if (dto.getId() == null || dto.getId().isBlank()) {
-                entity.setId(UUID.randomUUID().toString());
-            } else {
-                entity.setId(dto.getId());
-            }
+            entity.setId(java.util.UUID.randomUUID().toString());
             
             entity.setPhaseId(phaseId);
             entity.setFoundation(foundation); 

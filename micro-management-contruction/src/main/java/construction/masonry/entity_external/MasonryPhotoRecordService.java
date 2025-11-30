@@ -3,14 +3,13 @@ package construction.masonry.entity_external;
 import construction.components.photo.PhotoCategory;
 import construction.components.photo.PhotoRecordDTO;
 import construction.masonry.Masonry;
-import construction.masonry.MasonryRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class MasonryPhotoRecordService {
@@ -18,36 +17,14 @@ public class MasonryPhotoRecordService {
     @Inject
     MasonryPhotoRecordRepository repository;
 
-    @Inject
-    MasonryRepository masonryRepository;
-    
-    @Transactional
-    public void saveAll(List<PhotoRecordDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Masonry masonry = masonryRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Masonry não encontrada com ID: " + phaseId));
-        
-        for (PhotoRecordDTO dto : dtos) {
-            MasonryPhotoRecord entity = mapToEntity(dto);
-            
-            if (dto.getId() == null || dto.getId().isBlank()) {
-                entity.setId(UUID.randomUUID().toString());
-            } else {
-                entity.setId(dto.getId());
-            }
-            
-            entity.setPhaseId(phaseId);
-            entity.setMasonry(masonry); 
-            
-            repository.persist(entity);
-        }
-    }
-
-    protected MasonryPhotoRecord mapToEntity(PhotoRecordDTO dto) {
+    private MasonryPhotoRecord mapToEntity(PhotoRecordDTO dto, String phaseId, Masonry masonry) {
         MasonryPhotoRecord entity = new MasonryPhotoRecord();
+        
+        // ✅ Gera novo ID sempre
+        entity.setId(UUID.randomUUID().toString());
+        
+        entity.setPhaseId(phaseId);
+        entity.setMasonry(masonry);
         
         entity.setFilePath(dto.getFilePath() != null ? dto.getFilePath() : "caminho/padrao/imagem.jpg");
         entity.setCaption(dto.getCaption());
@@ -65,5 +42,16 @@ public class MasonryPhotoRecordService {
         }
         
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<PhotoRecordDTO> dtos, String phaseId, Masonry masonry) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<MasonryPhotoRecord> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, masonry))
+            .collect(Collectors.toList());
+
+        MasonryPhotoRecord.persist(entities);
     }
 }

@@ -6,12 +6,14 @@ import construction.hydraulic.entity_external.HydraulicMaterial;
 import construction.hydraulic.entity_external.HydraulicPhotoRecord;
 import construction.hydraulic.entity_external.HydraulicTeamMember;
 import construction.hydraulic.entity_external.HydraulicTool;
-
+import construction.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "hydraulics")
@@ -26,11 +28,9 @@ public class Hydraulic extends PanacheEntityBase {
     @Column(name = "contractor") // Usando name = "contractor" como na classe Structure
     private String contractor;
 
-    // Relacionamentos ajustados para serem IGUAIS à classe Structure:
-    // 1. Descomentados.
-    // 2. Inicializados com `new ArrayList<>()`.
-    // 3. Usando `FetchType.EAGER` (carregamento imediato dos dados relacionados).
-    // 4. Removido `orphanRemoval = true` (para total conformidade com a Structure, que não o usa).
+    @OneToOne
+    @JoinColumn(name = "user_id") 
+    private User user;
 
     @OneToMany(mappedBy = "hydraulic", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HydraulicMaterial> materials = new ArrayList<>();
@@ -50,14 +50,18 @@ public class Hydraulic extends PanacheEntityBase {
     @OneToMany(mappedBy = "hydraulic", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HydraulicPhotoRecord> photoRecords = new ArrayList<>();
 
-    /**
-     * Construtor para garantir a geração de ID, seguindo a lógica da classe Structure.
-     */
     public Hydraulic() {
         // Garante que o ID seja gerado se não existir
         this.id = UUID.randomUUID().toString();
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public String getId() {
         return id;

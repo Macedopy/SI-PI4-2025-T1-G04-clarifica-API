@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors; // Adicionado para o stream
 
 @ApplicationScoped
 public class FoundationExecutedServiceService {
@@ -20,28 +21,13 @@ public class FoundationExecutedServiceService {
     @Inject
     FoundationRepository foundationRepository;
 
-    @Transactional
-    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Foundation foundation = foundationRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Foundation não encontrada com ID: " + phaseId));
-
-        for (ExecutedServiceDTO dto : dtos) {
-            FoundationExecutedService entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString());
-            entity.setFoundation(foundation);
-            entity.setPhaseId(phaseId);
-            
-            System.out.println("Persistindo serviço: " + entity.getId() + " - " + entity.getName());
-            repository.persist(entity);
-        }
-    }
-
-    private FoundationExecutedService mapDtoToEntity(ExecutedServiceDTO dto) {
+    private FoundationExecutedService mapToEntity(ExecutedServiceDTO dto, String phaseId, Foundation foundation) {
         FoundationExecutedService entity = new FoundationExecutedService();
+
+        entity.setId(UUID.randomUUID().toString());
+
+        entity.setFoundation(foundation);
+        entity.setPhaseId(phaseId);
 
         // FIX DEFINITIVO: nunca mais null ou vazio
         entity.setName(
@@ -82,5 +68,23 @@ public class FoundationExecutedServiceService {
         }
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId) {
+        if (dtos == null || dtos.isEmpty()) {
+            return;
+        }
+
+        Foundation foundation = foundationRepository.findByIdOptional(phaseId)
+            .orElseThrow(() -> new NotFoundException("Foundation não encontrada com ID: " + phaseId));
+
+        List<FoundationExecutedService> entities = dtos.stream()
+            // Passa os dados de contexto e a DTO para mapeamento
+            .map(dto -> mapToEntity(dto, phaseId, foundation))
+            .collect(Collectors.toList());
+        
+        // Panache fará o UPSET (update ou insert) em lote.
+        FoundationExecutedService.persist(entities);
     }
 }

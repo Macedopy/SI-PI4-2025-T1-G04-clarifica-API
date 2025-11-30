@@ -4,13 +4,12 @@ import construction.components.team_present.MemberStatus;
 import construction.components.team_present.TeamMemberDTO;
 import construction.components.team_present.TeamMemberDetails;
 import construction.masonry.Masonry;
-import construction.masonry.MasonryRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class MasonryTeamMemberService {
@@ -18,51 +17,42 @@ public class MasonryTeamMemberService {
     @Inject
     MasonryTeamMemberRepository teamMemberRepository;
 
-    @Inject
-    MasonryRepository masonryRepository;
-
-    @Transactional
-    public void saveAll(List<TeamMemberDTO> memberDTOs, String phaseId) {
-        
-        if (memberDTOs == null || memberDTOs.isEmpty()) {
-            return;
-        }
-
-        Masonry masonry = masonryRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Masonry não encontrada com ID: " + phaseId));
-
-        for (TeamMemberDTO dto : memberDTOs) {
-            MasonryTeamMember entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString()); 
-            entity.setPhaseId(phaseId);
-            entity.setMasonry(masonry);
-            
-            System.out.println("Persistindo membro Masonry: " + entity.getId() + " - " + entity.getDetails().getName());
-            teamMemberRepository.persist(entity);
-        }
-    }
-
-    private MasonryTeamMember mapDtoToEntity(TeamMemberDTO dto) {
+    private MasonryTeamMember mapToEntity(TeamMemberDTO dto, String phaseId, Masonry masonry) {
         MasonryTeamMember entity = new MasonryTeamMember();
-        TeamMemberDetails details = new TeamMemberDetails();
         
-        // Tratamento de nome para evitar nulo
+        // ✅ Gera novo ID sempre
+        entity.setId(UUID.randomUUID().toString());
+        
+        entity.setPhaseId(phaseId);
+        entity.setMasonry(masonry);
+        
+        if (entity.getDetails() == null) {
+            entity.setDetails(new TeamMemberDetails());
+        }
+
         String name = dto.getName();
         if (name == null || name.trim().isEmpty()) {
             name = "Membro sem identificação";
         }
-        details.setName(name.trim());
-        
-        details.setRole(dto.getRole() != null ? dto.getRole().trim() : "Não informado");
-        details.setCpf(dto.getCpf());
+        entity.getDetails().setName(name.trim());
+        entity.getDetails().setRole(dto.getRole() != null ? dto.getRole().trim() : "Não informado");
+        entity.getDetails().setCpf(dto.getCpf());
 
-        entity.setDetails(details); 
         entity.setHoursWorked(dto.getHoursWorked());
-        
-        // Status padrão se vier nulo
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : MemberStatus.PRESENT);
         entity.setNotes(dto.getNotes());
         
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<TeamMemberDTO> dtos, String phaseId, Masonry masonry) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<MasonryTeamMember> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, masonry))
+            .collect(Collectors.toList());
+
+        MasonryTeamMember.persist(entities);
     }
 }

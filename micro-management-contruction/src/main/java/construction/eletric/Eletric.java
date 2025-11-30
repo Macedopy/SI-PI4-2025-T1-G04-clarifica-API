@@ -6,6 +6,7 @@ import construction.eletric.entity_external.EletricMaterial;
 import construction.eletric.entity_external.EletricPhotoRecord;
 import construction.eletric.entity_external.EletricTeamMember;
 import construction.eletric.entity_external.EletricTool;
+import construction.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -24,6 +25,10 @@ public class Eletric extends PanacheEntityBase {
 
     @Column(name = "contractor")
     private String contractor;
+
+    @OneToOne
+    @JoinColumn(name = "user_id") 
+    private User user;
 
     @OneToMany(mappedBy = "eletric", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<EletricMaterial> materials = new ArrayList<>();
@@ -46,6 +51,14 @@ public class Eletric extends PanacheEntityBase {
     public Eletric() {
         // Garante que o ID seja gerado se não existir
         this.id = UUID.randomUUID().toString();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getId() {

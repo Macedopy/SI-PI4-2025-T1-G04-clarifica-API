@@ -1,16 +1,22 @@
 package construction.user;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import construction.coatings.Coatings;
+import construction.eletric.Eletric;
+import construction.finishing.Finishing;
+import construction.foundation.Foundation;
+import construction.hydraulic.Hydraulic;
+import construction.masonry.Masonry;
+import construction.roofing.Roofing;
+import construction.structure.Structure;
 
 @Entity
 @Table(name = "users")
 public class User extends PanacheEntityBase {
+
     @Id
     private String id;
 
@@ -31,6 +37,37 @@ public class User extends PanacheEntityBase {
     @Column(nullable = false, unique = true)
     private String cpf;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
+
+    // Relacionamentos com as fases
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Foundation foundation;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Structure structure;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Masonry masonry;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Eletric electrical;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Hydraulic hydraulic;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Coatings coatings;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Finishing finishing;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Roofing roofing;
+
+    // Getters e Setters básicos
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -48,6 +85,67 @@ public class User extends PanacheEntityBase {
 
     public String getCpf() { return cpf; }
     public void setCpf(String cpf) { this.cpf = cpf; }
+
+    public UserRole getRole() { return role; }
+    public void setRole(UserRole role) { this.role = role; }
+
+    // ADICIONAR Getters e Setters das fases
+
+    public Foundation getFoundation() { 
+        return foundation; 
+    }
+    
+    public void setFoundation(Foundation foundation) { 
+        this.foundation = foundation; 
+    }
+
+    public Structure getStructure() { 
+        return structure; 
+    }
+    
+    public void setStructure(Structure structure) { 
+        this.structure = structure; 
+    }
+
+    public Finishing getFinishing() { 
+        return finishing; 
+    }
+    
+    public void setFinishing(Finishing finishing) { 
+        this.finishing = finishing; 
+    }
+
+    public Masonry getMasonry() { 
+        return masonry; 
+    }
+    
+    public void setMasonry(Masonry masonry) { 
+        this.masonry = masonry; 
+    }
+
+    public Eletric getElectrical() { 
+        return electrical; 
+    }
+    
+    public void setElectrical(Eletric electrical) { 
+        this.electrical = electrical; 
+    }
+
+    public Coatings getCoatings() { 
+        return coatings; 
+    }
+    
+    public void setCoatings(Coatings coatings) { 
+        this.coatings = coatings; 
+    }
+
+    public Roofing getRoofing() { 
+        return roofing; 
+    }
+    
+    public void setRoofing(Roofing roofing) { 
+        this.roofing = roofing; 
+    }
 
     public String fullName() {
         return firstName + " " + lastName;

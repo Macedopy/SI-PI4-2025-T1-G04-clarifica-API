@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors; // Adicionado para o stream
 
 @ApplicationScoped
 public class FoundationMachineryService {
@@ -21,38 +22,18 @@ public class FoundationMachineryService {
     @Inject
     FoundationRepository foundationRepository;
 
-    @Transactional
-    public void saveAll(List<MachineryDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Foundation foundation = foundationRepository.findByIdOptional(phaseId)
-                .orElseThrow(() -> new NotFoundException("Foundation não encontrada com ID: " + phaseId));
-
-        for (MachineryDTO dto : dtos) {
-            FoundationMachinery entity = mapToEntity(dto);
-            String idToUse;
-            if (dto.getId() != null && !dto.getId().isBlank()) {
-                idToUse = dto.getId();
-            } else {
-                idToUse = UUID.randomUUID().toString();
-            }
-            entity.setId(idToUse);
-            entity.setPhaseId(phaseId);
-            entity.setFoundation(foundation);
-
-            repository.persist(entity);
-        }
-    }
-
-    protected FoundationMachinery mapToEntity(MachineryDTO dto) {
+    protected FoundationMachinery mapToEntity(MachineryDTO dto, String phaseId, Foundation foundation) {
         FoundationMachinery entity = new FoundationMachinery();
+
+        entity.setId(UUID.randomUUID().toString());
+
+        entity.setPhaseId(phaseId);
+        entity.setFoundation(foundation);
 
         entity.setName(dto.getName());
         String category = dto.getCategory();
         if (category == null || category.isBlank()) {
-            category = "OTHER";  // default category
+            category = "OTHER";
         }
         entity.setCategory(category);
 
@@ -76,5 +57,23 @@ public class FoundationMachineryService {
         entity.setNotes(dto.getNotes());
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<MachineryDTO> dtos, String phaseId) {
+        if (dtos == null || dtos.isEmpty()) {
+            return;
+        }
+
+        Foundation foundation = foundationRepository.findByIdOptional(phaseId)
+            .orElseThrow(() -> new NotFoundException("Foundation não encontrada com ID: " + phaseId));
+
+        List<FoundationMachinery> entities = dtos.stream()
+            // Passa os dados de contexto e a DTO para mapeamento
+            .map(dto -> mapToEntity(dto, phaseId, foundation))
+            .collect(Collectors.toList());
+
+        // Panache fará o UPSET (update ou insert) em lote.
+        FoundationMachinery.persist(entities);
     }
 }

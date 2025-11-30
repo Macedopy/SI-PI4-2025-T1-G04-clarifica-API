@@ -1,6 +1,10 @@
 package construction.structure;
 
-import construction.structure.entity_external.StructureExecutedService; import construction.structure.entity_external.StructureMachinery; import construction.structure.entity_external.StructureMaterial; import construction.structure.entity_external.StructurePhotoRecord; import construction.structure.entity_external.StructureTeamMember; import construction.structure.entity_external.StructureTool; import io.quarkus.hibernate.orm.panache.PanacheEntityBase; import jakarta.persistence.*; import java.util.ArrayList; import java.util.List; import java.util.UUID;
+import construction.structure.entity_external.StructureExecutedService; import construction.structure.entity_external.StructureMachinery; import construction.structure.entity_external.StructureMaterial; import construction.structure.entity_external.StructurePhotoRecord; import construction.structure.entity_external.StructureTeamMember; import construction.structure.entity_external.StructureTool;
+import construction.user.User;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase; import jakarta.persistence.*; import java.util.ArrayList; import java.util.List; import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity @Table(name = "structures") public class Structure extends PanacheEntityBase {
 
@@ -12,6 +16,10 @@ import construction.structure.entity_external.StructureExecutedService; import c
 
     @Column(name = "contractor")
     private String contractor;
+
+    @OneToOne
+    @JoinColumn(name = "user_id") 
+    private User user;
 
     @OneToMany(mappedBy = "structure", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<StructureMaterial> materials = new ArrayList<>();
@@ -32,8 +40,15 @@ import construction.structure.entity_external.StructureExecutedService; import c
     private List<StructurePhotoRecord> photoRecords = new ArrayList<>();
 
     public Structure() {
-        // Garante que o ID seja gerado se não existir
         this.id = UUID.randomUUID().toString();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
 

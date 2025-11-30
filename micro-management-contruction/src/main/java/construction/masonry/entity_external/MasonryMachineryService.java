@@ -4,13 +4,12 @@ import construction.components.machinery.Condition;
 import construction.components.machinery.FuelUnit;
 import construction.components.machinery.MachineryDTO;
 import construction.masonry.Masonry;
-import construction.masonry.MasonryRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class MasonryMachineryService {
@@ -18,38 +17,15 @@ public class MasonryMachineryService {
     @Inject
     MasonryMachineryRepository repository;
 
-    @Inject
-    MasonryRepository masonryRepository;
-
-    @Transactional
-    public void saveAll(List<MachineryDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Masonry masonry = masonryRepository.findByIdOptional(phaseId)
-                .orElseThrow(() -> new NotFoundException("Masonry não encontrada com ID: " + phaseId));
-
-        for (MachineryDTO dto : dtos) {
-            MasonryMachinery entity = mapToEntity(dto);
-            String idToUse;
-            if (dto.getId() != null && !dto.getId().isBlank()) {
-                idToUse = dto.getId();
-            } else {
-                idToUse = UUID.randomUUID().toString();
-            }
-            entity.setId(idToUse);
-            entity.setPhaseId(phaseId);
-            entity.setMasonry(masonry);
-
-            repository.persist(entity);
-        }
-    }
-
-    protected MasonryMachinery mapToEntity(MachineryDTO dto) {
+    protected MasonryMachinery mapToEntity(MachineryDTO dto, String phaseId, Masonry masonry) {
         MasonryMachinery entity = new MasonryMachinery();
 
-        // Tratamento de nulos/defaults já que removemos o @NotBlank
+        // ✅ Gera novo ID sempre
+        entity.setId(UUID.randomUUID().toString());
+        
+        entity.setPhaseId(phaseId);
+        entity.setMasonry(masonry);
+
         entity.setName(
             dto.getName() != null && !dto.getName().isBlank() 
             ? dto.getName() 
@@ -58,7 +34,7 @@ public class MasonryMachineryService {
 
         String category = dto.getCategory();
         if (category == null || category.isBlank()) {
-            category = "OUTROS"; 
+            category = "OTHER";  
         }
         entity.setCategory(category);
 
@@ -73,10 +49,10 @@ public class MasonryMachineryService {
             try {
                 entity.setFuelUnit(FuelUnit.valueOf(dto.getFuelUnit().toUpperCase()));
             } catch (IllegalArgumentException e) {
-                entity.setFuelUnit(FuelUnit.LITERS); // Default
+                entity.setFuelUnit(FuelUnit.LITERS);
             }
         } else {
-            entity.setFuelUnit(FuelUnit.LITERS); // Default
+            entity.setFuelUnit(FuelUnit.LITERS);
         }
         
         if (dto.getCondition() != null && !dto.getCondition().isBlank()) {
@@ -92,5 +68,16 @@ public class MasonryMachineryService {
         entity.setNotes(dto.getNotes());
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<MachineryDTO> dtos, String phaseId, Masonry masonry) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<MasonryMachinery> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, masonry))
+            .collect(Collectors.toList());
+
+        MasonryMachinery.persist(entities);
     }
 }

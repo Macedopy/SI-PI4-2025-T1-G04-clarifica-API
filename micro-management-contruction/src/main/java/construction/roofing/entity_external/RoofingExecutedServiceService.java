@@ -3,13 +3,12 @@ package construction.roofing.entity_external;
 import construction.components.executed_services.ExecutedServiceDTO;
 import construction.components.executed_services.ExecutedServiceStatus;
 import construction.roofing.Roofing;
-import construction.roofing.RoofingRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class RoofingExecutedServiceService {
@@ -17,30 +16,12 @@ public class RoofingExecutedServiceService {
     @Inject
     RoofingExecutedServiceRepository repository;
 
-    @Inject
-    RoofingRepository roofingRepository;
-
-    @Transactional
-    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Roofing roofing = roofingRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Roofing não encontrada com ID: " + phaseId));
-
-        for (ExecutedServiceDTO dto : dtos) {
-            RoofingExecutedService entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString());
-            entity.setRoofing(roofing);
-            entity.setPhaseId(phaseId);
-            
-            repository.persist(entity);
-        }
-    }
-
-    private RoofingExecutedService mapDtoToEntity(ExecutedServiceDTO dto) {
+    private RoofingExecutedService mapToEntity(ExecutedServiceDTO dto, String phaseId, Roofing roofing) {
         RoofingExecutedService entity = new RoofingExecutedService();
+
+        entity.setId(UUID.randomUUID().toString());
+        entity.setRoofing(roofing);
+        entity.setPhaseId(phaseId);
 
         entity.setName(
             dto.getName() != null && !dto.getName().trim().isEmpty() 
@@ -54,10 +35,7 @@ public class RoofingExecutedServiceService {
                 : "Equipe Principal"
         );
 
-        entity.setPlannedHours(
-            dto.getPlannedHours() > 0 ? dto.getPlannedHours() : 8.0
-        );
-
+        entity.setPlannedHours(dto.getPlannedHours() > 0 ? dto.getPlannedHours() : 8.0);
         entity.setExecutedHours(dto.getExecutedHours() >= 0 ? dto.getExecutedHours() : 0.0);
 
         String statusStr = dto.getStatus() != null ? dto.getStatus().toUpperCase() : "PLANEJADO";
@@ -78,5 +56,16 @@ public class RoofingExecutedServiceService {
         }
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId, Roofing roofing) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<RoofingExecutedService> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, roofing))
+            .collect(Collectors.toList());
+        
+        RoofingExecutedService.persist(entities);
     }
 }

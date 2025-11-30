@@ -6,11 +6,14 @@ import construction.foundation.entity_external.FoundationMaterial;
 import construction.foundation.entity_external.FoundationPhotoRecord;
 import construction.foundation.entity_external.FoundationTeamMember;
 import construction.foundation.entity_external.FoundationTool;
+import construction.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "foundations")
@@ -24,6 +27,10 @@ public class Foundation extends PanacheEntityBase {
 
     @Column(name = "contractor")
     private String contractor;
+
+    @OneToOne
+    @JoinColumn(name = "user_id") 
+    private User user;
 
     @OneToMany(mappedBy = "foundation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<FoundationMaterial> materials = new ArrayList<>();
@@ -45,6 +52,14 @@ public class Foundation extends PanacheEntityBase {
 
     public Foundation() {
         this.id = UUID.randomUUID().toString();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getId() {

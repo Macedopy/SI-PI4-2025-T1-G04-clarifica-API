@@ -16,36 +16,28 @@ public class FoundationController {
     @Inject
     FoundationService foundationService;
 
+    // ============== CREATE (POST) ==============
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response createFoundationAndDetails(FoundationDTO detailsDTO) {
+        // Gera um ID único para a nova fase
         String phaseId = UUID.randomUUID().toString();
         
         try {
             System.out.println("========== INICIANDO SALVAMENTO FOUNDATION ==========");
-            System.out.println("Phase ID: " + phaseId);
-            System.out.println("DTO recebido: " + detailsDTO);
             
             Foundation foundation = new Foundation();
             foundation.setId(phaseId);
             foundation.setName(detailsDTO.getPhaseName()); 
             foundation.setContractor(detailsDTO.getContractor());
             
-            System.out.println("[1/3] Salvando Foundation...");
+            // 1. Salva a entidade principal (Foundation)
             foundationService.saveFoundation(foundation);
-            System.out.println("[1/3] ✓ Foundation salva com sucesso!");
             
-            System.out.println("[2/3] Verificando detalhes do DTO...");
-            if (detailsDTO.getEquipe() != null) {
-                System.out.println("  - Equipe: " + detailsDTO.getEquipe().size() + " membros");
-            } else {
-                System.out.println("  - Equipe: NULL");
-            }
-            
-            System.out.println("[3/3] Salvando detalhes da fase...");
+            // 2. Salva todos os detalhes (TeamMembers, Machinery, etc.)
             foundationService.saveAllPhaseDetails(phaseId, detailsDTO);
-            System.out.println("[3/3] ✓ Detalhes salvos com sucesso!");
             
             System.out.println("========== FOUNDATION SALVA COM SUCESSO ==========\n");
             
@@ -55,9 +47,7 @@ public class FoundationController {
                              
         } catch (Exception e) {
             System.err.println("========== ERRO NO SALVAMENTO FOUNDATION ==========");
-            System.err.println("Erro: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("=========================================\n");
             
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity(new ErrorDTO("Erro ao salvar Foundation", e.getMessage()))
@@ -65,22 +55,25 @@ public class FoundationController {
         }
     }
 
+    // ============== FULL UPDATE (PUT /customerId) ==============
+    // Este endpoint recebe todos os dados (principal + detalhes) e faz a substituição completa.
+    
     @PUT
-    @Path("/{id}")
+    @Path("/{customerId}")
     @Transactional
-    public Response updateFoundation(@PathParam("id") String id, FoundationDTO detailsDTO) {
+    public Response updateFoundation(@PathParam("customerId") String customerId, FoundationDTO detailsDTO) {
         try {
             System.out.println("========== INICIANDO UPDATE COMPLETO FOUNDATION ==========");
-            Foundation tempFoundation = new Foundation();
             
-            if (detailsDTO.getPhaseName() != null) {
-                tempFoundation.setName(detailsDTO.getPhaseName());
-            }
-            tempFoundation.setContractor(detailsDTO.getContractor());
-            
-            foundationService.updateFoundation(id, tempFoundation);
+            // 1. foundationService.updateFoundation: 
+            //    - Atualiza os campos principais.
+            //    - DELETA TODOS os registros filhos antigos.
+            // Retorna o ID da Foundation existente.
+            String foundationId = foundationService.updateFoundation(customerId, detailsDTO);
 
-            foundationService.saveAllPhaseDetails(id, detailsDTO);
+            // 2. foundationService.saveAllPhaseDetails: 
+            //    - RECRIA TODOS os registros filhos com os novos dados do DTO.
+            foundationService.saveAllPhaseDetails(foundationId, detailsDTO);
             
             System.out.println("========== UPDATE CONCLUÍDO ==========");
 
@@ -95,6 +88,9 @@ public class FoundationController {
         }
     }
 
+    // ============== DETAILS ONLY UPDATE (PUT /id/details) ==============
+    // Endpoint para quem deseja atualizar SOMENTE os detalhes de uma Foundation já existente.
+    
     @PUT
     @Path("/{id}/details")
     @Transactional
@@ -103,15 +99,25 @@ public class FoundationController {
         FoundationDTO detailsDTO) {
         
         try {
+            // 1. Deleta os detalhes existentes (limpeza obrigatória antes de recriar)
+            foundationService.deleteAllPhaseDetails(phaseId); 
+            
+            // 2. Salva/Recria os novos detalhes
             foundationService.saveAllPhaseDetails(phaseId, detailsDTO);
+            
             return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("Erro ao atualizar detalhes: " + e.getMessage())
                            .build();
         }
     }
 
+    // ============== READ (GET) ==============
+    
     @GET
     @Path("/{id}")
     public Response getFoundation(@PathParam("id") String id) {
@@ -124,6 +130,8 @@ public class FoundationController {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    // ============== DTOs de Resposta ==============
+    
     public static class ResponseDTO {
         public String message;
         public String phaseId;

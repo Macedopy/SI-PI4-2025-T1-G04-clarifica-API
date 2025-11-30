@@ -1,4 +1,4 @@
-package construction.masonry;
+package construction.roofing;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -8,45 +8,45 @@ import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import java.util.UUID;
 
-@Path("/masonry")
+@Path("/roofing")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class MasonryController {
+public class RoofingController {
     
     @Inject
-    MasonryService masonryService;
+    RoofingService roofingService;
 
     // ============== CREATE (POST) ==============
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response createMasonryAndDetails(MasonryDTO detailsDTO) {
+    public Response createRoofingAndDetails(RoofingDTO detailsDTO) {
         String phaseId = UUID.randomUUID().toString();
         
         try {
-            System.out.println("========== INICIANDO SALVAMENTO MASONRY ==========");
+            System.out.println("========== INICIANDO SALVAMENTO ROOFING ==========");
             
-            Masonry masonry = new Masonry();
-            masonry.setId(phaseId);
-            masonry.setName(detailsDTO.getPhaseName()); 
-            masonry.setContractor(detailsDTO.getContractor());
+            Roofing roofing = new Roofing();
+            roofing.setId(phaseId);
+            roofing.setName(detailsDTO.getPhaseName());
+            roofing.setContractor(detailsDTO.getContractor());
             
-            masonryService.saveMasonry(masonry);
-            masonryService.saveAllPhaseDetails(phaseId, detailsDTO);
+            roofingService.saveRoofing(roofing);
+            roofingService.saveAllPhaseDetails(phaseId, detailsDTO);
             
-            System.out.println("========== MASONRY SALVO COM SUCESSO ==========\n");
+            System.out.println("========== ROOFING SALVO COM SUCESSO ==========\n");
             
             return Response.status(Response.Status.CREATED)
-                           .entity(new ResponseDTO("Fase Masonry criada com sucesso", phaseId))
+                           .entity(new ResponseDTO("Fase Roofing criada com sucesso", phaseId))
                            .build();
                              
         } catch (Exception e) {
-            System.err.println("========== ERRO NO SALVAMENTO MASONRY ==========");
+            System.err.println("========== ERRO NO SALVAMENTO ROOFING ==========");
             e.printStackTrace();
             
             return Response.status(Response.Status.BAD_REQUEST)
-                           .entity(new ErrorDTO("Erro ao salvar Masonry", e.getMessage()))
+                           .entity(new ErrorDTO("Erro ao salvar Roofing", e.getMessage()))
                            .build();
         }
     }
@@ -56,15 +56,12 @@ public class MasonryController {
     @PUT
     @Path("/{customerId}")
     @Transactional
-    public Response updateMasonry(@PathParam("customerId") String customerId, MasonryDTO detailsDTO) {
+    public Response updateRoofing(@PathParam("customerId") String customerId, RoofingDTO detailsDTO) {
         try {
-            System.out.println("========== INICIANDO UPDATE COMPLETO MASONRY ==========");
+            System.out.println("========== INICIANDO UPDATE COMPLETO ROOFING ==========");
             
-            // 1. Atualiza campos principais e deleta detalhes antigos
-            String masonryId = masonryService.updateMasonry(customerId, detailsDTO);
-
-            // 2. Recria todos os detalhes com os novos dados
-            masonryService.saveAllPhaseDetails(masonryId, detailsDTO);
+            String roofingId = roofingService.updateRoofing(customerId, detailsDTO);
+            roofingService.saveAllPhaseDetails(roofingId, detailsDTO);
             
             System.out.println("========== UPDATE CONCLUÍDO ==========");
 
@@ -85,13 +82,10 @@ public class MasonryController {
     @PUT
     @Path("/{id}/details")
     @Transactional
-    public Response updateMasonryDetails(@PathParam("id") String phaseId, MasonryDTO detailsDTO) {
+    public Response updateRoofingDetails(@PathParam("id") String phaseId, RoofingDTO detailsDTO) {
         try {
-            // 1. Deleta os detalhes existentes
-            masonryService.deleteAllPhaseDetails(phaseId);
-            
-            // 2. Salva/Recria os novos detalhes
-            masonryService.saveAllPhaseDetails(phaseId, detailsDTO);
+            roofingService.deleteAllPhaseDetails(phaseId);
+            roofingService.saveAllPhaseDetails(phaseId, detailsDTO);
             
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (NotFoundException e) {
@@ -108,11 +102,11 @@ public class MasonryController {
     
     @GET
     @Path("/{id}")
-    public Response getMasonry(@PathParam("id") String id) {
-        Optional<Masonry> masonry = masonryService.getMasonryById(id);
+    public Response getRoofing(@PathParam("id") String id) {
+        Optional<Roofing> roofing = roofingService.getRoofingById(id);
         
-        if (masonry.isPresent()) {
-            return Response.ok(masonry.get()).build();
+        if (roofing.isPresent()) {
+            return Response.ok(roofing.get()).build();
         }
         
         return Response.status(Response.Status.NOT_FOUND).build();

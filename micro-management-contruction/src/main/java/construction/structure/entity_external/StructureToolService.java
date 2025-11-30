@@ -3,40 +3,26 @@ package construction.structure.entity_external;
 import construction.components.tools.ToolCondition;
 import construction.components.tools.ToolDTO;
 import construction.structure.Structure;
-import construction.structure.StructureRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class StructureToolService {
 
     @Inject StructureToolRepository repository;
-    @Inject StructureRepository structureRepository;
 
-    @Transactional
-    public void saveAll(List<ToolDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) return;
-
-        Structure structure = structureRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Structure não encontrada com ID: " + phaseId));
-
-        for (ToolDTO dto : dtos) {
-            StructureTool entity = mapToEntity(dto);
-            entity.setId(dto.getId() != null && !dto.getId().isBlank() ? dto.getId() : UUID.randomUUID().toString());
-            entity.setPhaseId(phaseId);
-            entity.setStructure(structure);
-
-            System.out.println("Persistindo ferramenta: " + entity.getId() + " - " + entity.getName());
-            repository.persist(entity);
-        }
-    }
-
-    private StructureTool mapToEntity(ToolDTO dto) {
+    private StructureTool mapToEntity(ToolDTO dto, String phaseId, Structure structure) {
         StructureTool entity = new StructureTool();
+        
+        // ✅ Gera novo ID sempre
+        entity.setId(UUID.randomUUID().toString());
+        
+        entity.setPhaseId(phaseId);
+        entity.setStructure(structure);
 
         entity.setName(
             dto.getName() != null && !dto.getName().trim().isEmpty()
@@ -69,5 +55,16 @@ public class StructureToolService {
         entity.setNotes(dto.getNotes());
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<ToolDTO> dtos, String phaseId, Structure structure) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<StructureTool> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, structure))
+            .collect(Collectors.toList());
+
+        StructureTool.persist(entities);
     }
 }

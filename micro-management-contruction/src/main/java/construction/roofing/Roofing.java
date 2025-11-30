@@ -6,6 +6,7 @@ import construction.roofing.entity_external.RoofingMaterial;
 import construction.roofing.entity_external.RoofingPhotoRecord;
 import construction.roofing.entity_external.RoofingTeamMember;
 import construction.roofing.entity_external.RoofingTool;
+import construction.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -43,9 +44,21 @@ public class Roofing extends PanacheEntityBase {
     @OneToMany(mappedBy = "roofing", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RoofingPhotoRecord> photoRecords = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "user_id") 
+    private User user;
+
     public Roofing() {
         // Garante que o ID seja gerado se não existir
         this.id = UUID.randomUUID().toString();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getId() {

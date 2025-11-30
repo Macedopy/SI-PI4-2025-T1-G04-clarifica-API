@@ -3,13 +3,12 @@ package construction.masonry.entity_external;
 import construction.components.executed_services.ExecutedServiceDTO;
 import construction.components.executed_services.ExecutedServiceStatus;
 import construction.masonry.Masonry;
-import construction.masonry.MasonryRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class MasonryExecutedServiceService {
@@ -17,32 +16,14 @@ public class MasonryExecutedServiceService {
     @Inject
     MasonryExecutedServiceRepository repository;
 
-    @Inject
-    MasonryRepository masonryRepository; 
-
-    @Transactional
-    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        // Busca a Masonry (Fase pai)
-        Masonry masonry = masonryRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Masonry não encontrada com ID: " + phaseId));
-
-        for (ExecutedServiceDTO dto : dtos) {
-            MasonryExecutedService entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString());
-            entity.setMasonry(masonry); // Seta o pai
-            entity.setPhaseId(phaseId);
-            
-            System.out.println("Persistindo serviço Masonry: " + entity.getId() + " - " + entity.getName());
-            repository.persist(entity);
-        }
-    }
-
-    private MasonryExecutedService mapDtoToEntity(ExecutedServiceDTO dto) {
+    private MasonryExecutedService mapToEntity(ExecutedServiceDTO dto, String phaseId, Masonry masonry) {
         MasonryExecutedService entity = new MasonryExecutedService();
+
+        // ✅ Gera novo ID sempre
+        entity.setId(UUID.randomUUID().toString());
+        
+        entity.setMasonry(masonry);
+        entity.setPhaseId(phaseId);
 
         entity.setName(
             dto.getName() != null && !dto.getName().trim().isEmpty() 
@@ -56,10 +37,7 @@ public class MasonryExecutedServiceService {
                 : "Equipe Principal"
         );
 
-        entity.setPlannedHours(
-            dto.getPlannedHours() > 0 ? dto.getPlannedHours() : 8.0
-        );
-
+        entity.setPlannedHours(dto.getPlannedHours() > 0 ? dto.getPlannedHours() : 8.0);
         entity.setExecutedHours(dto.getExecutedHours() >= 0 ? dto.getExecutedHours() : 0.0);
 
         String statusStr = dto.getStatus() != null ? dto.getStatus().toUpperCase() : "PLANEJADO";
@@ -80,5 +58,16 @@ public class MasonryExecutedServiceService {
         }
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId, Masonry masonry) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<MasonryExecutedService> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, masonry))
+            .collect(Collectors.toList());
+        
+        MasonryExecutedService.persist(entities);
     }
 }

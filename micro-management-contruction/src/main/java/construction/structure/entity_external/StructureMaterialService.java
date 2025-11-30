@@ -4,46 +4,26 @@ import construction.components.used_material.MaterialCategory;
 import construction.components.used_material.MaterialDTO;
 import construction.components.used_material.MaterialUnit;
 import construction.structure.Structure;
-import construction.structure.StructureRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class StructureMaterialService {
 
     @Inject StructureMaterialRepository repository;
-    @Inject StructureRepository structureRepository;
 
-    @Transactional
-    public void saveAll(List<MaterialDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) return;
-
-        Structure structure = structureRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Structure não encontrada com ID: " + phaseId));
-
-        for (MaterialDTO dto : dtos) {
-            StructureMaterial entity = mapToEntity(dto);
-            String idToUse;
-            if (dto.getId() != null && !dto.getId().isBlank()) {
-                idToUse = dto.getId();
-            } else {
-                idToUse = UUID.randomUUID().toString();
-            }
-            entity.setId(idToUse);
-            entity.setPhaseId(phaseId);
-            entity.setStructure(structure);
-
-            System.out.println("Persistindo material: " + entity.getId() + " - " + entity.getName());
-            repository.persist(entity);
-        }
-    }
-
-    private StructureMaterial mapToEntity(MaterialDTO dto) {
+    private StructureMaterial mapToEntity(MaterialDTO dto, String phaseId, Structure structure) {
         StructureMaterial entity = new StructureMaterial();
+
+        // ✅ Gera novo ID sempre
+        entity.setId(UUID.randomUUID().toString());
+        
+        entity.setPhaseId(phaseId);
+        entity.setStructure(structure);
 
         entity.setName(
             dto.getName() != null && !dto.getName().trim().isEmpty()
@@ -75,5 +55,16 @@ public class StructureMaterialService {
         entity.updateRestockStatus();
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<MaterialDTO> dtos, String phaseId, Structure structure) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<StructureMaterial> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, structure))
+            .collect(Collectors.toList());
+
+        StructureMaterial.persist(entities);
     }
 }

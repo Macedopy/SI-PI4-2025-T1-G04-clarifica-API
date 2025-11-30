@@ -16,69 +16,55 @@ public class StructureController {
     @Inject
     StructureService structureService;
 
+    // ============== CREATE (POST) ==============
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response createStructureAndDetails(StructureDTO detailsDTO) {
         String phaseId = UUID.randomUUID().toString();
+        
         try {
-            System.out.println("========== INICIANDO SALVAMENTO ==========");
-            System.out.println("Phase ID: " + phaseId);
-            System.out.println("DTO recebido: " + detailsDTO);
-
+            System.out.println("========== INICIANDO SALVAMENTO STRUCTURE ==========");
+            
             Structure structure = new Structure();
             structure.setId(phaseId);
             structure.setName(detailsDTO.getPhaseName());
             structure.setContractor(detailsDTO.getContractor());
 
-            System.out.println("[1/3] Salvando Structure...");
             structureService.saveStructure(structure);
-            System.out.println("[1/3] ✓ Structure salva com sucesso!");
-
-            System.out.println("[2/3] Verificando detalhes do DTO...");
-            if (detailsDTO.getEquipe() != null) {
-                System.out.println("  - Equipe: " + detailsDTO.getEquipe().size() + " membros");
-            } else {
-                System.out.println("  - Equipe: NULL");
-            }
-
-            System.out.println("[3/3] Salvando detalhes da fase...");
             structureService.saveAllPhaseDetails(phaseId, detailsDTO);
-            System.out.println("[3/3] ✓ Detalhes salvos com sucesso!");
-            System.out.println("========== SALVAMENTO CONCLUÍDO COM SUCESSO ==========\n");
+            
+            System.out.println("========== STRUCTURE SALVA COM SUCESSO ==========\n");
 
             return Response.status(Response.Status.CREATED)
-                    .entity(new ResponseDTO("Fase criada com sucesso", phaseId))
+                    .entity(new ResponseDTO("Fase Structure criada com sucesso", phaseId))
                     .build();
 
         } catch (Exception e) {
-            System.err.println("========== ERRO NO SALVAMENTO ==========");
-            System.err.println("Erro: " + e.getMessage());
+            System.err.println("========== ERRO NO SALVAMENTO STRUCTURE ==========");
             e.printStackTrace();
-            System.err.println("=========================================\n");
 
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ErrorDTO("Erro ao salvar", e.getMessage()))
+                    .entity(new ErrorDTO("Erro ao salvar Structure", e.getMessage()))
                     .build();
         }
     }
 
+    // ============== FULL UPDATE (PUT /{id}) ==============
+    
     @PUT
     @Path("/{id}")
     @Transactional
     public Response updateStructure(@PathParam("id") String id, StructureDTO detailsDTO) {
         try {
-            System.out.println("========== INICIANDO UPDATE COMPLETO ==========");
-            Structure tempStructure = new Structure();
+            System.out.println("========== INICIANDO UPDATE COMPLETO STRUCTURE ==========");
             
-            if (detailsDTO.getPhaseName() != null) {
-                tempStructure.setName(detailsDTO.getPhaseName());
-            }
-            tempStructure.setContractor(detailsDTO.getContractor());
-            
-            structureService.updateStructure(id, tempStructure);
+            // 1. Atualiza campos principais e deleta detalhes antigos
+            String structureId = structureService.updateStructure(id, detailsDTO);
 
-            structureService.saveAllPhaseDetails(id, detailsDTO);
+            // 2. Recria todos os detalhes com os novos dados
+            structureService.saveAllPhaseDetails(structureId, detailsDTO);
             
             System.out.println("========== UPDATE CONCLUÍDO ==========");
 
@@ -87,37 +73,53 @@ public class StructureController {
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
-            e.printStackTrace(); // Ajuda a ver o erro no terminal se acontecer
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Erro ao atualizar: " + e.getMessage())
                     .build();
         }
     }
 
+    // ============== DETAILS ONLY UPDATE (PUT /{id}/details) ==============
+    
     @PUT
     @Path("/{id}/details")
     @Transactional
     public Response updateStructureDetails(@PathParam("id") String phaseId, StructureDTO detailsDTO) {
         try {
+            // 1. Deleta os detalhes existentes
+            structureService.deleteAllPhaseDetails(phaseId);
+            
+            // 2. Salva/Recria os novos detalhes
             structureService.saveAllPhaseDetails(phaseId, detailsDTO);
+            
             return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Erro ao atualizar detalhes: " + e.getMessage())
                     .build();
         }
     }
 
+    // ============== READ (GET) ==============
+    
     @GET
     @Path("/{id}")
     public Response getStructure(@PathParam("id") String id) {
         Optional<Structure> structure = structureService.getStructureById(id);
+        
         if (structure.isPresent()) {
             return Response.ok(structure.get()).build();
         }
+        
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    // ============== DTOs de Resposta ==============
+    
     public static class ResponseDTO {
         public String message;
         public String phaseId;
