@@ -3,6 +3,7 @@ package construction.roofing;
 import java.util.Optional;
 
 import construction.roofing.entity_external.*;
+import construction.structure.Structure;
 import construction.user.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -96,5 +97,9 @@ public class RoofingService {
 
     public Optional<Roofing> getRoofingById(String id) {
         return roofingRepository.findByIdOptional(id);
+    }
+
+    public Optional<Roofing> getRoofingByCustomerId(String customerId) {
+        return roofingRepository.find("userId", customerId).firstResultOptional();
     }
 }

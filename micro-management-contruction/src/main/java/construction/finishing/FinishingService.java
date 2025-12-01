@@ -2,6 +2,7 @@ package construction.finishing;
 
 import java.util.Optional;
 
+import construction.eletric.Eletric;
 import construction.finishing.entity_external.FinishingExecutedServiceService;
 import construction.finishing.entity_external.FinishingMachineryService;
 import construction.finishing.entity_external.FinishingMaterialService;
@@ -93,5 +94,9 @@ public class FinishingService {
 
     public Optional<Finishing> getFinishingById(String id) {
         return finishingRepository.findByIdOptional(id);
+    }
+
+    public Optional<Finishing> getFinishingByCustomerId(String customerId) {
+        return finishingRepository.find("userId", customerId).firstResultOptional();
     }
 }

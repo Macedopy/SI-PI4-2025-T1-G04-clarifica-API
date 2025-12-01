@@ -1,6 +1,8 @@
 package construction.foundation;
 
 import java.util.Optional;
+
+import construction.eletric.Eletric;
 import construction.foundation.entity_external.FoundationExecutedService;
 import construction.foundation.entity_external.FoundationExecutedServiceService;
 import construction.foundation.entity_external.FoundationMachinery;
@@ -106,5 +108,9 @@ public class FoundationService {
 
     public Optional<Foundation> getFoundationById(String id) {
         return foundationRepository.findByIdOptional(id);
+    }
+
+    public Optional<Foundation> getFoundationByCustomerId(String customerId) {
+        return foundationRepository.find("userId", customerId).firstResultOptional();
     }
 }

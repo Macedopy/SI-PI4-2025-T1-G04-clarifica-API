@@ -4,13 +4,12 @@ import construction.components.team_present.MemberStatus;
 import construction.components.team_present.TeamMemberDTO;
 import construction.components.team_present.TeamMemberDetails;
 import construction.hydraulic.Hydraulic;
-import construction.hydraulic.HydraulicRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class HydraulicTeamMemberService {
@@ -18,54 +17,40 @@ public class HydraulicTeamMemberService {
     @Inject
     HydraulicTeamMemberRepository teamMemberRepository;
 
-    @Inject
-    HydraulicRepository hydraulicRepository;
-
-    @Transactional
-    public void saveAll(List<TeamMemberDTO> memberDTOs, String phaseId) {
-
-        if (memberDTOs == null || memberDTOs.isEmpty()) {
-            return;
-        }
-
-        Hydraulic hydraulic = hydraulicRepository.findByIdOptional(phaseId)
-                .orElseThrow(() -> new NotFoundException("Hydraulic não encontrada com ID: " + phaseId));
-
-        for (TeamMemberDTO dto : memberDTOs) {
-            HydraulicTeamMember entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString());
-            entity.setPhaseId(phaseId);
-            entity.setHydraulic(hydraulic);
-
-            System.out.println("Persistindo membro Hydraulic: "
-                    + entity.getId() + " - " + entity.getDetails().getName());
-
-            teamMemberRepository.persist(entity);
-        }
-    }
-
-    private HydraulicTeamMember mapDtoToEntity(TeamMemberDTO dto) {
+    private HydraulicTeamMember mapToEntity(TeamMemberDTO dto, String phaseId, Hydraulic hydraulic) {
         HydraulicTeamMember entity = new HydraulicTeamMember();
-        TeamMemberDetails details = new TeamMemberDetails();
+        
+        entity.setId(UUID.randomUUID().toString());
+        entity.setPhaseId(phaseId);
+        entity.setHydraulic(hydraulic);
+        
+        if (entity.getDetails() == null) {
+            entity.setDetails(new TeamMemberDetails());
+        }
 
-        // Nome seguro
         String name = dto.getName();
         if (name == null || name.trim().isEmpty()) {
             name = "Membro sem identificação";
         }
-        details.setName(name.trim());
+        entity.getDetails().setName(name.trim());
+        entity.getDetails().setRole(dto.getRole() != null ? dto.getRole().trim() : "Não informado");
+        entity.getDetails().setCpf(dto.getCpf());
 
-        details.setRole(dto.getRole() != null ? dto.getRole().trim() : "Não informado");
-        details.setCpf(dto.getCpf());
-
-        entity.setDetails(details);
         entity.setHoursWorked(dto.getHoursWorked());
-
-        // Status seguro
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : MemberStatus.PRESENT);
-
         entity.setNotes(dto.getNotes());
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<TeamMemberDTO> dtos, String phaseId, Hydraulic hydraulic) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<HydraulicTeamMember> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, hydraulic))
+            .collect(Collectors.toList());
+
+        HydraulicTeamMember.persist(entities);
     }
 }

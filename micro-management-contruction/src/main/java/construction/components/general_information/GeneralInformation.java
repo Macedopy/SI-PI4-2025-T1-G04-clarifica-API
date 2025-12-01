@@ -24,9 +24,8 @@ public class GeneralInformation extends PanacheEntityBase {
     @Column(name = "land_area", nullable = false)
     private double landArea;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Topography topography;
+    private String topography;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -69,11 +68,11 @@ public class GeneralInformation extends PanacheEntityBase {
         this.landArea = landArea;
     }
 
-    public Topography getTopography() {
+    public String getTopography() {
         return topography;
     }
 
-    public void setTopography(Topography topography) {
+    public void setTopography(String topography) {
         this.topography = topography;
     }
 

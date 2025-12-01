@@ -2,6 +2,7 @@ package construction.user;
 
 import construction.foundation.Foundation;
 import construction.structure.Structure;
+import construction.terrain_preparation.TerrainPreparation;
 import construction.eletric.Eletric;
 import construction.finishing.Finishing;
 import construction.masonry.Masonry;
@@ -104,6 +105,14 @@ public class UserService {
         finishing.setUser(user);
         finishing.persist();
         user.setRoofing(roofing);
+
+        TerrainPreparation terrainPreparation = new TerrainPreparation();
+        terrainPreparation.setId(UUID.randomUUID().toString());
+        terrainPreparation.setName("Terrain Preparation - " + contractorName);
+        terrainPreparation.setContractor(contractorName);
+        terrainPreparation.setUser(user);
+        terrainPreparation.persist();
+        user.setTerrainPreparation(terrainPreparation);
 
     }
 

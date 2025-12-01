@@ -103,7 +103,7 @@ public class RoofingController {
     @GET
     @Path("/{id}")
     public Response getRoofing(@PathParam("id") String id) {
-        Optional<Roofing> roofing = roofingService.getRoofingById(id);
+        Optional<Roofing> roofing = roofingService.getRoofingByCustomerId(id);
         
         if (roofing.isPresent()) {
             return Response.ok(roofing.get()).build();

@@ -115,7 +115,7 @@ public class FinishingController {
     @GET
     @Path("/{id}")
     public Response getFinishing(@PathParam("id") String id) {
-        Optional<Finishing> finishing = finishingService.getFinishingById(id);
+        Optional<Finishing> finishing = finishingService.getFinishingByCustomerId(id);
 
         if (finishing.isPresent()) {
             return Response.ok(finishing.get()).build();

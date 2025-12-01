@@ -3,6 +3,7 @@ package construction.structure;
 import java.util.Optional;
 
 import construction.structure.entity_external.*;
+import construction.terrain_preparation.TerrainPreparation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -113,5 +114,9 @@ public class StructureService {
 
     public Optional<Structure> getStructureById(String id){
         return structureRepository.findByIdOptional(id);
+    }
+
+    public Optional<Structure> getTerrainStructureByCustomerId(String customerId) {
+        return structureRepository.find("userId", customerId).firstResultOptional();
     }
 }

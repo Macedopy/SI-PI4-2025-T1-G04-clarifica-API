@@ -4,14 +4,12 @@ import construction.components.machinery.Condition;
 import construction.components.machinery.FuelUnit;
 import construction.components.machinery.MachineryDTO;
 import construction.hydraulic.Hydraulic;
-import construction.hydraulic.HydraulicRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
-
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class HydraulicMachineryService {
@@ -19,40 +17,14 @@ public class HydraulicMachineryService {
     @Inject
     HydraulicMachineryRepository repository;
 
-    @Inject
-    HydraulicRepository hydraulicRepository;
-
-    @Transactional
-    public void saveAll(List<MachineryDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Hydraulic hydraulic = hydraulicRepository.findByIdOptional(phaseId)
-                .orElseThrow(() -> new NotFoundException("Hydraulic não encontrada com ID: " + phaseId));
-
-        for (MachineryDTO dto : dtos) {
-            HydraulicMachinery entity = mapToEntity(dto);
-
-            String idToUse;
-            if (dto.getId() != null && !dto.getId().isBlank()) {
-                idToUse = dto.getId();
-            } else {
-                idToUse = UUID.randomUUID().toString();
-            }
-
-            entity.setId(idToUse);
-            entity.setPhaseId(phaseId);
-            entity.setHydraulic(hydraulic);
-
-            repository.persist(entity);
-        }
-    }
-
-    protected HydraulicMachinery mapToEntity(MachineryDTO dto) {
+    protected HydraulicMachinery mapToEntity(MachineryDTO dto, String phaseId, Hydraulic hydraulic) {
         HydraulicMachinery entity = new HydraulicMachinery();
 
-        entity.setName(dto.getName());
+        entity.setId(UUID.randomUUID().toString());
+        entity.setPhaseId(phaseId);
+        entity.setHydraulic(hydraulic);
+
+        entity.setName(dto.getName() != null && !dto.getName().isBlank() ? dto.getName() : "Equipamento sem nome");
 
         String category = dto.getCategory();
         if (category == null || category.isBlank()) {
@@ -60,25 +32,46 @@ public class HydraulicMachineryService {
         }
         entity.setCategory(category);
 
-        entity.setTotalQuantity(dto.getTotalQuantity());
-        entity.setInOperation(dto.getInOperation());
-        entity.setInMaintenance(dto.getInMaintenance());
+        entity.setTotalQuantity(Math.max(1, dto.getTotalQuantity()));
+        entity.setInOperation(Math.max(0, dto.getInOperation()));
+        entity.setInMaintenance(Math.max(0, dto.getInMaintenance()));
 
-        entity.setHoursWorked(dto.getHoursWorked());
-        entity.setFuelUsed(dto.getFuelUsed());
-
+        entity.setHoursWorked(Math.max(0, dto.getHoursWorked()));
+        entity.setFuelUsed(Math.max(0, dto.getFuelUsed()));
+        
         if (dto.getFuelUnit() != null) {
-            entity.setFuelUnit(FuelUnit.valueOf(dto.getFuelUnit().toUpperCase()));
+            try {
+                entity.setFuelUnit(FuelUnit.valueOf(dto.getFuelUnit().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                entity.setFuelUnit(FuelUnit.LITERS);
+            }
+        } else {
+            entity.setFuelUnit(FuelUnit.LITERS);
         }
-
+        
         if (dto.getCondition() != null && !dto.getCondition().isBlank()) {
-            entity.setCondition(Condition.valueOf(dto.getCondition().toUpperCase()));
+            try {
+                entity.setCondition(Condition.valueOf(dto.getCondition().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                entity.setCondition(Condition.GOOD);
+            }
         } else {
             entity.setCondition(Condition.GOOD);
         }
-
+        
         entity.setNotes(dto.getNotes());
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<MachineryDTO> dtos, String phaseId, Hydraulic hydraulic) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<HydraulicMachinery> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, hydraulic))
+            .collect(Collectors.toList());
+
+        HydraulicMachinery.persist(entities);
     }
 }

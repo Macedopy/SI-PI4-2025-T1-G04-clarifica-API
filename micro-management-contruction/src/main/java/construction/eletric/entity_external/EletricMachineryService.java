@@ -4,13 +4,12 @@ import construction.components.machinery.Condition;
 import construction.components.machinery.FuelUnit;
 import construction.components.machinery.MachineryDTO;
 import construction.eletric.Eletric;
-import construction.eletric.EletricRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class EletricMachineryService {
@@ -18,38 +17,13 @@ public class EletricMachineryService {
     @Inject
     EletricMachineryRepository repository;
 
-    @Inject
-    EletricRepository eletricRepository;
-
-    @Transactional
-    public void saveAll(List<MachineryDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Eletric eletric = eletricRepository.findByIdOptional(phaseId)
-                .orElseThrow(() -> new NotFoundException("Fase Elétrica não encontrada com ID: " + phaseId));
-
-        for (MachineryDTO dto : dtos) {
-            EletricMachinery entity = mapToEntity(dto);
-            String idToUse;
-            if (dto.getId() != null && !dto.getId().isBlank()) {
-                idToUse = dto.getId();
-            } else {
-                idToUse = UUID.randomUUID().toString();
-            }
-            entity.setId(idToUse);
-            entity.setPhaseId(phaseId);
-            entity.setEletric(eletric);
-
-            repository.persist(entity);
-        }
-    }
-
-    protected EletricMachinery mapToEntity(MachineryDTO dto) {
+    protected EletricMachinery mapToEntity(MachineryDTO dto, String phaseId, Eletric eletric) {
         EletricMachinery entity = new EletricMachinery();
 
-        // Tratamento para evitar nulos
+        entity.setId(UUID.randomUUID().toString());
+        entity.setPhaseId(phaseId);
+        entity.setEletric(eletric);
+
         entity.setName(
             dto.getName() != null && !dto.getName().isBlank() 
             ? dto.getName() 
@@ -58,7 +32,7 @@ public class EletricMachineryService {
 
         String category = dto.getCategory();
         if (category == null || category.isBlank()) {
-            category = "OUTROS"; 
+            category = "OTHER";  
         }
         entity.setCategory(category);
 
@@ -69,7 +43,6 @@ public class EletricMachineryService {
         entity.setHoursWorked(Math.max(0, dto.getHoursWorked()));
         entity.setFuelUsed(Math.max(0, dto.getFuelUsed()));
         
-        // Enum FuelUnit
         if (dto.getFuelUnit() != null) {
             try {
                 entity.setFuelUnit(FuelUnit.valueOf(dto.getFuelUnit().toUpperCase()));
@@ -80,7 +53,6 @@ public class EletricMachineryService {
             entity.setFuelUnit(FuelUnit.LITERS);
         }
         
-        // Enum Condition
         if (dto.getCondition() != null && !dto.getCondition().isBlank()) {
             try {
                 entity.setCondition(Condition.valueOf(dto.getCondition().toUpperCase()));
@@ -94,5 +66,16 @@ public class EletricMachineryService {
         entity.setNotes(dto.getNotes());
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<MachineryDTO> dtos, String phaseId, Eletric eletric) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<EletricMachinery> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, eletric))
+            .collect(Collectors.toList());
+
+        EletricMachinery.persist(entities);
     }
 }

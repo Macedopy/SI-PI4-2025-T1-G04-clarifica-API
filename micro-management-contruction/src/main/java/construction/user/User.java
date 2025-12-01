@@ -12,6 +12,7 @@ import construction.hydraulic.Hydraulic;
 import construction.masonry.Masonry;
 import construction.roofing.Roofing;
 import construction.structure.Structure;
+import construction.terrain_preparation.TerrainPreparation;
 
 @Entity
 @Table(name = "users")
@@ -66,6 +67,12 @@ public class User extends PanacheEntityBase {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Roofing roofing;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Eletric eletric;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private TerrainPreparation terrainPreparation;
+
     // Getters e Setters básicos
 
     public String getId() { return id; }
@@ -97,6 +104,22 @@ public class User extends PanacheEntityBase {
     
     public void setFoundation(Foundation foundation) { 
         this.foundation = foundation; 
+    }
+
+    public TerrainPreparation getTerrainPreparation() { 
+        return terrainPreparation; 
+    }
+    
+    public void setTerrainPreparation(TerrainPreparation terrainPreparation) { 
+        this.terrainPreparation = terrainPreparation; 
+    }
+
+    public Hydraulic getHydraulic() { 
+        return hydraulic; 
+    }
+    
+    public void setHydraulic(Hydraulic hydraulic) { 
+        this.hydraulic = hydraulic; 
     }
 
     public Structure getStructure() { 

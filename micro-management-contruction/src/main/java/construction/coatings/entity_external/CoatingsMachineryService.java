@@ -1,16 +1,15 @@
 package construction.coatings.entity_external;
 
 import construction.coatings.Coatings;
-import construction.coatings.CoatingsRepository;
 import construction.components.machinery.Condition;
 import construction.components.machinery.FuelUnit;
 import construction.components.machinery.MachineryDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CoatingsMachineryService {
@@ -18,38 +17,13 @@ public class CoatingsMachineryService {
     @Inject
     CoatingsMachineryRepository repository;
 
-    @Inject
-    CoatingsRepository coatingsRepository;
-
-    @Transactional
-    public void saveAll(List<MachineryDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Coatings coatings = coatingsRepository.findByIdOptional(phaseId)
-                .orElseThrow(() -> new NotFoundException("Fase Coatings (Revestimentos) não encontrada com ID: " + phaseId));
-
-        for (MachineryDTO dto : dtos) {
-            CoatingsMachinery entity = mapToEntity(dto);
-            String idToUse;
-            if (dto.getId() != null && !dto.getId().isBlank()) {
-                idToUse = dto.getId();
-            } else {
-                idToUse = UUID.randomUUID().toString();
-            }
-            entity.setId(idToUse);
-            entity.setPhaseId(phaseId);
-            entity.setCoatings(coatings);
-
-            repository.persist(entity);
-        }
-    }
-
-    protected CoatingsMachinery mapToEntity(MachineryDTO dto) {
+    protected CoatingsMachinery mapToEntity(MachineryDTO dto, String phaseId, Coatings coatings) {
         CoatingsMachinery entity = new CoatingsMachinery();
 
-        // Tratamento para evitar nulos
+        entity.setId(UUID.randomUUID().toString());
+        entity.setPhaseId(phaseId);
+        entity.setCoatings(coatings);
+
         entity.setName(
             dto.getName() != null && !dto.getName().isBlank() 
             ? dto.getName() 
@@ -58,7 +32,7 @@ public class CoatingsMachineryService {
 
         String category = dto.getCategory();
         if (category == null || category.isBlank()) {
-            category = "OUTROS"; 
+            category = "OTHER";  
         }
         entity.setCategory(category);
 
@@ -69,7 +43,6 @@ public class CoatingsMachineryService {
         entity.setHoursWorked(Math.max(0, dto.getHoursWorked()));
         entity.setFuelUsed(Math.max(0, dto.getFuelUsed()));
         
-        // Enum FuelUnit com fallback
         if (dto.getFuelUnit() != null) {
             try {
                 entity.setFuelUnit(FuelUnit.valueOf(dto.getFuelUnit().toUpperCase()));
@@ -80,7 +53,6 @@ public class CoatingsMachineryService {
             entity.setFuelUnit(FuelUnit.LITERS);
         }
         
-        // Enum Condition com fallback
         if (dto.getCondition() != null && !dto.getCondition().isBlank()) {
             try {
                 entity.setCondition(Condition.valueOf(dto.getCondition().toUpperCase()));
@@ -94,5 +66,16 @@ public class CoatingsMachineryService {
         entity.setNotes(dto.getNotes());
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<MachineryDTO> dtos, String phaseId, Coatings coatings) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<CoatingsMachinery> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, coatings))
+            .collect(Collectors.toList());
+
+        CoatingsMachinery.persist(entities);
     }
 }

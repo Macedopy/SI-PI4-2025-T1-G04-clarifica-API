@@ -121,7 +121,7 @@ public class FoundationController {
     @GET
     @Path("/{id}")
     public Response getFoundation(@PathParam("id") String id) {
-        Optional<Foundation> foundation = foundationService.getFoundationById(id);
+        Optional<Foundation> foundation = foundationService.getFoundationByCustomerId(id);
 
         if (foundation.isPresent()) {
             return Response.ok(foundation.get()).build();

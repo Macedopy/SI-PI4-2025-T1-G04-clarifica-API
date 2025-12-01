@@ -109,7 +109,7 @@ public class MasonryController {
     @GET
     @Path("/{id}")
     public Response getMasonry(@PathParam("id") String id) {
-        Optional<Masonry> masonry = masonryService.getMasonryById(id);
+        Optional<Masonry> masonry = masonryService.getMasonryByCustomerId(id);
         
         if (masonry.isPresent()) {
             return Response.ok(masonry.get()).build();

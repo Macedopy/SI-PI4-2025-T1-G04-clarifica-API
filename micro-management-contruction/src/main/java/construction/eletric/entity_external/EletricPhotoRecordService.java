@@ -3,14 +3,13 @@ package construction.eletric.entity_external;
 import construction.components.photo.PhotoCategory;
 import construction.components.photo.PhotoRecordDTO;
 import construction.eletric.Eletric;
-import construction.eletric.EletricRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class EletricPhotoRecordService {
@@ -18,38 +17,13 @@ public class EletricPhotoRecordService {
     @Inject
     EletricPhotoRecordRepository repository;
 
-    @Inject
-    EletricRepository eletricRepository;
-    
-    @Transactional
-    public void saveAll(List<PhotoRecordDTO> dtos, String phaseId) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        Eletric eletric = eletricRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Fase Elétrica não encontrada com ID: " + phaseId));
-        
-        for (PhotoRecordDTO dto : dtos) {
-            EletricPhotoRecord entity = mapToEntity(dto);
-            
-            if (dto.getId() == null || dto.getId().isBlank()) {
-                entity.setId(UUID.randomUUID().toString());
-            } else {
-                entity.setId(dto.getId());
-            }
-            
-            entity.setPhaseId(phaseId);
-            entity.setEletric(eletric); 
-            
-            repository.persist(entity);
-        }
-    }
-
-    protected EletricPhotoRecord mapToEntity(PhotoRecordDTO dto) {
+    private EletricPhotoRecord mapToEntity(PhotoRecordDTO dto, String phaseId, Eletric eletric) {
         EletricPhotoRecord entity = new EletricPhotoRecord();
         
-        // Tratamento simples se vier nulo/vazio (já que removemos @NotBlank)
+        entity.setId(UUID.randomUUID().toString());
+        entity.setPhaseId(phaseId);
+        entity.setEletric(eletric);
+        
         entity.setFilePath(
             dto.getFilePath() != null && !dto.getFilePath().isBlank() 
             ? dto.getFilePath() 
@@ -58,12 +32,10 @@ public class EletricPhotoRecordService {
         
         entity.setCaption(dto.getCaption());
         
-        // Conversão direta igual Foundation
         try {
             entity.setCategory(PhotoCategory.fromString(dto.getCategory()));
         } catch (Exception e) {
-             // Fallback caso venha nulo ou inválido
-             entity.setCategory(PhotoCategory.PROGRESS);
+            entity.setCategory(PhotoCategory.PROGRESS);
         }
 
         if (dto.getUploadedAt() != null) {
@@ -77,5 +49,16 @@ public class EletricPhotoRecordService {
         }
         
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<PhotoRecordDTO> dtos, String phaseId, Eletric eletric) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<EletricPhotoRecord> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, eletric))
+            .collect(Collectors.toList());
+
+        EletricPhotoRecord.persist(entities);
     }
 }

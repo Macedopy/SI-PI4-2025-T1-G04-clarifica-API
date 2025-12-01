@@ -3,6 +3,7 @@ package construction.masonry;
 import java.util.Optional;
 
 import construction.masonry.entity_external.*;
+import construction.structure.Structure;
 import construction.user.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -118,5 +119,9 @@ public class MasonryService {
 
     public Optional<Masonry> getMasonryById(String id) {
         return masonryRepository.findByIdOptional(id);
+    }
+
+    public Optional<Masonry> getMasonryByCustomerId(String customerId) {
+        return masonryRepository.find("userId", customerId).firstResultOptional();
     }
 }

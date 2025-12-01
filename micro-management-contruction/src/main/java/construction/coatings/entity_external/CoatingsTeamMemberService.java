@@ -1,16 +1,15 @@
 package construction.coatings.entity_external;
 
 import construction.coatings.Coatings;
-import construction.coatings.CoatingsRepository;
 import construction.components.team_present.MemberStatus;
 import construction.components.team_present.TeamMemberDTO;
 import construction.components.team_present.TeamMemberDetails;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CoatingsTeamMemberService {
@@ -18,51 +17,40 @@ public class CoatingsTeamMemberService {
     @Inject
     CoatingsTeamMemberRepository teamMemberRepository;
 
-    @Inject
-    CoatingsRepository coatingsRepository;
-
-    @Transactional
-    public void saveAll(List<TeamMemberDTO> memberDTOs, String phaseId) {
-        
-        if (memberDTOs == null || memberDTOs.isEmpty()) {
-            return;
-        }
-
-        Coatings coatings = coatingsRepository.findByIdOptional(phaseId)
-            .orElseThrow(() -> new NotFoundException("Fase Coatings (Revestimentos) não encontrada com ID: " + phaseId));
-
-        for (TeamMemberDTO dto : memberDTOs) {
-            CoatingsTeamMember entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString()); 
-            entity.setPhaseId(phaseId);
-            entity.setCoatings(coatings);
-            
-            System.out.println("Persistindo membro da equipe de revestimento: " + entity.getId() + " - " + entity.getDetails().getName());
-            teamMemberRepository.persist(entity);
-        }
-    }
-
-    private CoatingsTeamMember mapDtoToEntity(TeamMemberDTO dto) {
+    private CoatingsTeamMember mapToEntity(TeamMemberDTO dto, String phaseId, Coatings coatings) {
         CoatingsTeamMember entity = new CoatingsTeamMember();
-        TeamMemberDetails details = new TeamMemberDetails();
         
-        // Tratamento de segurança para nome
+        entity.setId(UUID.randomUUID().toString());
+        entity.setPhaseId(phaseId);
+        entity.setCoatings(coatings);
+        
+        if (entity.getDetails() == null) {
+            entity.setDetails(new TeamMemberDetails());
+        }
+
         String name = dto.getName();
         if (name == null || name.trim().isEmpty()) {
             name = "Membro sem identificação";
         }
-        details.setName(name.trim());
-        
-        details.setRole(dto.getRole() != null ? dto.getRole().trim() : "Não informado");
-        details.setCpf(dto.getCpf());
+        entity.getDetails().setName(name.trim());
+        entity.getDetails().setRole(dto.getRole() != null ? dto.getRole().trim() : "Não informado");
+        entity.getDetails().setCpf(dto.getCpf());
 
-        entity.setDetails(details); 
         entity.setHoursWorked(dto.getHoursWorked());
-        
-        // Status padrão
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : MemberStatus.PRESENT);
         entity.setNotes(dto.getNotes());
         
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<TeamMemberDTO> dtos, String phaseId, Coatings coatings) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<CoatingsTeamMember> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, coatings))
+            .collect(Collectors.toList());
+
+        CoatingsTeamMember.persist(entities);
     }
 }

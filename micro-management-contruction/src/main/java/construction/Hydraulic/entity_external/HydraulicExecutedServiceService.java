@@ -3,14 +3,12 @@ package construction.hydraulic.entity_external;
 import construction.components.executed_services.ExecutedServiceDTO;
 import construction.components.executed_services.ExecutedServiceStatus;
 import construction.hydraulic.Hydraulic;
-import construction.hydraulic.HydraulicRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
-
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class HydraulicExecutedServiceService {
@@ -18,38 +16,13 @@ public class HydraulicExecutedServiceService {
     @Inject
     HydraulicExecutedServiceRepository repository;
 
-    @Inject
-    HydraulicRepository hydraulicRepository;
-
-    @Transactional
-    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId) {
-
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        // Busca a Hydraulic (Fase pai)
-        Hydraulic hydraulic = hydraulicRepository.findByIdOptional(phaseId)
-                .orElseThrow(() ->
-                        new NotFoundException("Hydraulic não encontrada com ID: " + phaseId)
-                );
-
-        for (ExecutedServiceDTO dto : dtos) {
-            HydraulicExecutedService entity = mapDtoToEntity(dto);
-            entity.setId(UUID.randomUUID().toString());
-            entity.setHydraulic(hydraulic);
-            entity.setPhaseId(phaseId);
-
-            System.out.println("Persistindo serviço Hidráulico: " + entity.getId() + " - " + entity.getName());
-
-            repository.persist(entity);
-        }
-    }
-
-    private HydraulicExecutedService mapDtoToEntity(ExecutedServiceDTO dto) {
+    private HydraulicExecutedService mapToEntity(ExecutedServiceDTO dto, String phaseId, Hydraulic hydraulic) {
         HydraulicExecutedService entity = new HydraulicExecutedService();
 
-        // Evita qualquer valor nulo ou vazio que quebraria o banco
+        entity.setId(UUID.randomUUID().toString());
+        entity.setHydraulic(hydraulic);
+        entity.setPhaseId(phaseId);
+
         entity.setName(
                 dto.getName() != null && !dto.getName().trim().isEmpty()
                         ? dto.getName().trim()
@@ -62,15 +35,9 @@ public class HydraulicExecutedServiceService {
                         : "Equipe Hidráulica"
         );
 
-        entity.setPlannedHours(
-                dto.getPlannedHours() > 0 ? dto.getPlannedHours() : 8.0
-        );
+        entity.setPlannedHours(dto.getPlannedHours() > 0 ? dto.getPlannedHours() : 8.0);
+        entity.setExecutedHours(dto.getExecutedHours() >= 0 ? dto.getExecutedHours() : 0.0);
 
-        entity.setExecutedHours(
-                dto.getExecutedHours() >= 0 ? dto.getExecutedHours() : 0.0
-        );
-
-        // Correção do status
         String statusStr = dto.getStatus() != null ? dto.getStatus().toUpperCase() : "PLANEJADO";
         statusStr = statusStr.replace("ANDAMENTO", "EM_ANDAMENTO");
 
@@ -90,5 +57,16 @@ public class HydraulicExecutedServiceService {
         }
 
         return entity;
+    }
+
+    @Transactional
+    public void saveAll(List<ExecutedServiceDTO> dtos, String phaseId, Hydraulic hydraulic) {
+        if (dtos == null || dtos.isEmpty()) return;
+
+        List<HydraulicExecutedService> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, hydraulic))
+            .collect(Collectors.toList());
+        
+        HydraulicExecutedService.persist(entities);
     }
 }

@@ -8,93 +8,61 @@ import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import java.util.UUID;
 
-// O Controller de Hydraulic (Hidráulica) espelhado do Structure (Estrutura)
 @Path("/hydraulic")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class HydraulicController {
 
     @Inject
-    HydraulicService hydraulicService; // Serviço injetado
+    HydraulicService hydraulicService;
 
-    // ====================================================================
-    // 1. POST: Criar Hydraulic e Detalhes
-    // ====================================================================
+    // ============== CREATE (POST) ==============
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response createHydraulicAndDetails(HydraulicDTO detailsDTO) {
         String phaseId = UUID.randomUUID().toString();
+        
         try {
-            System.out.println("========== INICIANDO SALVAMENTO ==========");
-            System.out.println("Phase ID: " + phaseId);
-            System.out.println("DTO recebido: " + detailsDTO);
-
+            System.out.println("========== INICIANDO SALVAMENTO HYDRAULIC ==========");
+            
             Hydraulic hydraulic = new Hydraulic();
             hydraulic.setId(phaseId);
             hydraulic.setName(detailsDTO.getPhaseName());
             hydraulic.setContractor(detailsDTO.getContractor());
 
-            System.out.println("[1/3] Salvando Hydraulic...");
             hydraulicService.saveHydraulic(hydraulic);
-            System.out.println("[1/3] ✓ Hydraulic salvo com sucesso!");
-
-            System.out.println("[2/3] Verificando detalhes do DTO...");
-            if (detailsDTO.getEquipe() != null) {
-                System.out.println("  - Equipe: " + detailsDTO.getEquipe().size() + " membros");
-            } else {
-                System.out.println("  - Equipe: NULL");
-            }
-
-            System.out.println("[3/3] Salvando detalhes da fase...");
             hydraulicService.saveAllPhaseDetails(phaseId, detailsDTO);
-            System.out.println("[3/3] ✓ Detalhes salvos com sucesso!");
-
-            System.out.println("========== SALVAMENTO CONCLUÍDO COM SUCESSO ==========\n");
+            
+            System.out.println("========== HYDRAULIC SALVO COM SUCESSO ==========\n");
 
             return Response.status(Response.Status.CREATED)
-                    .entity(new ResponseDTO("Fase criada com sucesso", phaseId))
+                    .entity(new ResponseDTO("Fase Hydraulic criada com sucesso", phaseId))
                     .build();
 
         } catch (Exception e) {
-            System.err.println("========== ERRO NO SALVAMENTO ==========");
-            System.err.println("Erro: " + e.getMessage());
+            System.err.println("========== ERRO NO SALVAMENTO HYDRAULIC ==========");
             e.printStackTrace();
-            System.err.println("=========================================\n");
 
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ErrorDTO("Erro ao salvar", e.getMessage()))
+                    .entity(new ErrorDTO("Erro ao salvar Hydraulic", e.getMessage()))
                     .build();
         }
     }
 
-    // ====================================================================
-    // 2. PUT /{id}: Atualizar Hydraulic e Detalhes (UPDATE COMPLETO)
-    // ESTE MÉTODO FOI CORRIGIDO PARA ESPELHAR O STRUCTURECONTROLLER
-    // ====================================================================
+    // ============== FULL UPDATE (PUT /{customerId}) ==============
+    
     @PUT
-    @Path("/{id}")
+    @Path("/{customerId}")
     @Transactional
-    // Recebe HydraulicDTO e atualiza a entidade principal e os detalhes
-    public Response updateHydraulic(@PathParam("id") String id, HydraulicDTO detailsDTO) {
+    public Response updateHydraulic(@PathParam("customerId") String customerId, HydraulicDTO detailsDTO) {
         try {
-            System.out.println("========== INICIANDO UPDATE COMPLETO ==========");
-
-            // Criamos uma entidade temporária apenas com os campos que queremos atualizar na tabela principal
-            Hydraulic tempHydraulic = new Hydraulic();
-
-            if (detailsDTO.getPhaseName() != null) {
-                tempHydraulic.setName(detailsDTO.getPhaseName());
-            }
-            // Supondo que 'contractor' nunca é nulo ou é obrigatório no DTO
-            tempHydraulic.setContractor(detailsDTO.getContractor());
-
-            // 1. Atualiza a entidade Hydraulic
-            hydraulicService.updateHydraulic(id, tempHydraulic);
-
-            // 2. Atualiza os detalhes da fase
-            hydraulicService.saveAllPhaseDetails(id, detailsDTO);
-
+            System.out.println("========== INICIANDO UPDATE COMPLETO HYDRAULIC ==========");
+            
+            String hydraulicId = hydraulicService.updateHydraulic(customerId, detailsDTO);
+            hydraulicService.saveAllPhaseDetails(hydraulicId, detailsDTO);
+            
             System.out.println("========== UPDATE CONCLUÍDO ==========");
 
             return Response.status(Response.Status.NO_CONTENT).build();
@@ -102,46 +70,50 @@ public class HydraulicController {
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
-            e.printStackTrace(); // Ajuda a ver o erro no terminal se acontecer
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Erro ao atualizar: " + e.getMessage())
                     .build();
         }
     }
 
-    // ====================================================================
-    // 3. PUT /{id}/details: Atualizar Apenas Detalhes
-    // ====================================================================
+    // ============== DETAILS ONLY UPDATE (PUT /{id}/details) ==============
+    
     @PUT
     @Path("/{id}/details")
     @Transactional
     public Response updateHydraulicDetails(@PathParam("id") String phaseId, HydraulicDTO detailsDTO) {
         try {
+            hydraulicService.deleteAllPhaseDetails(phaseId);
             hydraulicService.saveAllPhaseDetails(phaseId, detailsDTO);
+            
             return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Erro ao atualizar detalhes: " + e.getMessage())
                     .build();
         }
     }
 
-    // ====================================================================
-    // 4. GET /{id}: Obter Hydraulic
-    // ====================================================================
+    // ============== READ (GET) ==============
+    
     @GET
     @Path("/{id}")
     public Response getHydraulic(@PathParam("id") String id) {
-        Optional<Hydraulic> hydraulic = hydraulicService.getHydraulicById(id);
+        Optional<Hydraulic> hydraulic = hydraulicService.getHydrauliconByCustomerId(id);
+        
         if (hydraulic.isPresent()) {
             return Response.ok(hydraulic.get()).build();
         }
+        
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    // ====================================================================
-    // Classes auxiliares para resposta (DTOs)
-    // ====================================================================
+    // ============== DTOs de Resposta ==============
+    
     public static class ResponseDTO {
         public String message;
         public String phaseId;
@@ -162,3 +134,4 @@ public class HydraulicController {
         }
     }
 }
+    

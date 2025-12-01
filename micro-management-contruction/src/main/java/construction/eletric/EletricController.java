@@ -16,6 +16,8 @@ public class EletricController {
     @Inject
     EletricService eletricService;
 
+    // ============== CREATE (POST) ==============
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
@@ -24,28 +26,14 @@ public class EletricController {
         
         try {
             System.out.println("========== INICIANDO SALVAMENTO ELÉTRICA ==========");
-            System.out.println("Phase ID: " + phaseId);
-            System.out.println("DTO recebido: " + detailsDTO);
             
             Eletric eletric = new Eletric();
             eletric.setId(phaseId);
             eletric.setName(detailsDTO.getPhaseName()); 
             eletric.setContractor(detailsDTO.getContractor());
             
-            System.out.println("[1/3] Salvando Eletric...");
             eletricService.saveEletric(eletric);
-            System.out.println("[1/3] ✓ Eletric salva com sucesso!");
-            
-            System.out.println("[2/3] Verificando detalhes do DTO...");
-            if (detailsDTO.getEquipe() != null) {
-                System.out.println("  - Equipe: " + detailsDTO.getEquipe().size() + " membros");
-            } else {
-                System.out.println("  - Equipe: NULL");
-            }
-            
-            System.out.println("[3/3] Salvando detalhes da fase...");
             eletricService.saveAllPhaseDetails(phaseId, detailsDTO);
-            System.out.println("[3/3] ✓ Detalhes salvos com sucesso!");
             
             System.out.println("========== ELÉTRICA SALVA COM SUCESSO ==========\n");
             
@@ -55,9 +43,7 @@ public class EletricController {
                              
         } catch (Exception e) {
             System.err.println("========== ERRO NO SALVAMENTO ELÉTRICA ==========");
-            System.err.println("Erro: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("=========================================\n");
             
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity(new ErrorDTO("Erro ao salvar Elétrica", e.getMessage()))
@@ -65,26 +51,22 @@ public class EletricController {
         }
     }
 
+    // ============== FULL UPDATE (PUT /{customerId}) ==============
+    
     @PUT
-    @Path("/{id}")
+    @Path("/{customerId}")
     @Transactional
-    public Response updateEletric(@PathParam("id") String id, EletricDTO detailsDTO) {
+    public Response updateEletric(@PathParam("customerId") String customerId, EletricDTO detailsDTO) {
         try {
             System.out.println("========== INICIANDO UPDATE COMPLETO ELÉTRICA ==========");
-            Eletric tempEletric = new Eletric();
             
-            if (detailsDTO.getPhaseName() != null) {
-                tempEletric.setName(detailsDTO.getPhaseName());
-            }
-            tempEletric.setContractor(detailsDTO.getContractor());
-            
-            eletricService.updateEletric(id, tempEletric);
-
-            eletricService.saveAllPhaseDetails(id, detailsDTO);
+            String eletricId = eletricService.updateEletric(customerId, detailsDTO);
+            eletricService.saveAllPhaseDetails(eletricId, detailsDTO);
             
             System.out.println("========== UPDATE CONCLUÍDO ==========");
 
             return Response.status(Response.Status.NO_CONTENT).build();
+            
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -95,27 +77,33 @@ public class EletricController {
         }
     }
 
+    // ============== DETAILS ONLY UPDATE (PUT /{id}/details) ==============
+    
     @PUT
     @Path("/{id}/details")
     @Transactional
-    public Response updateEletricDetails(
-        @PathParam("id") String phaseId, 
-        EletricDTO detailsDTO) {
-        
+    public Response updateEletricDetails(@PathParam("id") String phaseId, EletricDTO detailsDTO) {
         try {
+            eletricService.deleteAllPhaseDetails(phaseId);
             eletricService.saveAllPhaseDetails(phaseId, detailsDTO);
+            
             return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("Erro ao atualizar detalhes: " + e.getMessage())
                            .build();
         }
     }
 
+    // ============== READ (GET) ==============
+    
     @GET
     @Path("/{id}")
     public Response getEletric(@PathParam("id") String id) {
-        Optional<Eletric> eletric = eletricService.getEletricById(id);
+        Optional<Eletric> eletric = eletricService.getEletricByCustomerId(id);
 
         if (eletric.isPresent()) {
             return Response.ok(eletric.get()).build();
@@ -124,6 +112,8 @@ public class EletricController {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    // ============== DTOs de Resposta ==============
+    
     public static class ResponseDTO {
         public String message;
         public String phaseId;

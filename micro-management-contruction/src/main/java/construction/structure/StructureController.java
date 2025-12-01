@@ -109,7 +109,7 @@ public class StructureController {
     @GET
     @Path("/{id}")
     public Response getStructure(@PathParam("id") String id) {
-        Optional<Structure> structure = structureService.getStructureById(id);
+        Optional<Structure> structure = structureService.getTerrainStructureByCustomerId(id);
         
         if (structure.isPresent()) {
             return Response.ok(structure.get()).build();
