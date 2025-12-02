@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "coatings")
@@ -30,6 +31,7 @@ public class Coatings extends PanacheEntityBase {
 
     @OneToOne
     @JoinColumn(name = "user_id") 
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "coatings", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

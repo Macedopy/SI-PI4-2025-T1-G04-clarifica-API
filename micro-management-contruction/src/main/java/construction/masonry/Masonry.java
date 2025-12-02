@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "masonry")
@@ -23,6 +24,7 @@ public class Masonry extends PanacheEntityBase {
     
     @OneToOne
     @JoinColumn(name = "user_id") 
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "masonry", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

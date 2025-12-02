@@ -8,11 +8,12 @@ import construction.finishing.Finishing;
 import construction.masonry.Masonry;
 import construction.roofing.Roofing;
 import construction.coatings.Coatings;
-// ... imports das outras fases
 
 import java.util.UUID;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import clarifica.infrastructure.Client.ManipulationClient; 
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -28,7 +29,16 @@ public class UserService {
     @Transactional
     public UserDTO createUser(UserDTO userDTO) {
         User user = new User();
-        user.setId(UUID.randomUUID().toString().split("-")[0]);
+
+        String tokenDoServidor = ManipulationClient.obterTokenDoServidor();
+
+        if (tokenDoServidor != null && !tokenDoServidor.equals("ERRO_TOKEN") && !tokenDoServidor.isEmpty()) {
+            user.setId(tokenDoServidor);
+        } else {
+            System.out.println("Aviso: Não foi possível conectar ao servidor de IDs. Usando UUID local.");
+            user.setId(UUID.randomUUID().toString().split("-")[0]);
+        }
+
         user.setFirstName(userDTO.getPersonalInformation().getFirstName());
         user.setLastName(userDTO.getPersonalInformation().getLastName());
         user.setEmail(userDTO.getPersonalInformation().getEmail());
@@ -100,11 +110,11 @@ public class UserService {
 
         Finishing finishing = new Finishing();
         finishing.setId(UUID.randomUUID().toString());
-        finishing.setName("Roofing - " + contractorName);
+        finishing.setName("Finishing - " + contractorName);
         finishing.setContractor(contractorName);
         finishing.setUser(user);
         finishing.persist();
-        user.setRoofing(roofing);
+        user.setFinishing(finishing); 
 
         TerrainPreparation terrainPreparation = new TerrainPreparation();
         terrainPreparation.setId(UUID.randomUUID().toString());
