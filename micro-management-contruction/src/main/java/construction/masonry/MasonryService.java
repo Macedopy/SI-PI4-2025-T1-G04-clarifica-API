@@ -122,6 +122,6 @@ public class MasonryService {
     }
 
     public Optional<Masonry> getMasonryByCustomerId(String customerId) {
-        return masonryRepository.find("userId", customerId).firstResultOptional();
+        return masonryRepository.find("user.id", customerId).firstResultOptional();
     }
 }

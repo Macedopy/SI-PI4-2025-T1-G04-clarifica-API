@@ -5,6 +5,7 @@ import construction.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase; import jakarta.persistence.*; import java.util.ArrayList; import java.util.List; import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity @Table(name = "structures") public class Structure extends PanacheEntityBase {
 
@@ -18,7 +19,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
     private String contractor;
 
     @OneToOne
-    @JoinColumn(name = "user_id") 
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "structure", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

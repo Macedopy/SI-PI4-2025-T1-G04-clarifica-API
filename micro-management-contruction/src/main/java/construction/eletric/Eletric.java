@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "eletric")
 public class Eletric extends PanacheEntityBase {
@@ -27,7 +29,8 @@ public class Eletric extends PanacheEntityBase {
     private String contractor;
 
     @OneToOne
-    @JoinColumn(name = "user_id") 
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "eletric", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

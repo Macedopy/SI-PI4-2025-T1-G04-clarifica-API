@@ -111,6 +111,6 @@ public class FoundationService {
     }
 
     public Optional<Foundation> getFoundationByCustomerId(String customerId) {
-        return foundationRepository.find("userId", customerId).firstResultOptional();
+        return foundationRepository.find("user.id", customerId).firstResultOptional();
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "foundations")
@@ -29,7 +30,8 @@ public class Foundation extends PanacheEntityBase {
     private String contractor;
 
     @OneToOne
-    @JoinColumn(name = "user_id") 
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "foundation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

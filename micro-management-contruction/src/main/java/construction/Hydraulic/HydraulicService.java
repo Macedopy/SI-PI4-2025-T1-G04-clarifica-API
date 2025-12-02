@@ -123,7 +123,7 @@ public class HydraulicService {
         return hydraulicRepository.findByIdOptional(id);
     }
 
-    public Optional<Hydraulic> getHydrauliconByCustomerId(String customerId) {
-        return hydraulicRepository.find("userId", customerId).firstResultOptional();
+    public Optional<Hydraulic> getHydraulicByCustomerId(String customerId) {
+        return hydraulicRepository.find("user.id", customerId).firstResultOptional();
     }
 }

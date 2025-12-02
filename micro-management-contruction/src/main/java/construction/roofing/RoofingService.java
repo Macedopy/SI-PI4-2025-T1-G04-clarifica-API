@@ -100,6 +100,6 @@ public class RoofingService {
     }
 
     public Optional<Roofing> getRoofingByCustomerId(String customerId) {
-        return roofingRepository.find("userId", customerId).firstResultOptional();
+        return roofingRepository.find("user.id", customerId).firstResultOptional();
     }
 }

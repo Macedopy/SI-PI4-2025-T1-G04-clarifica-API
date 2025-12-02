@@ -56,27 +56,24 @@ public class StructureController {
     @PUT
     @Path("/{id}")
     @Transactional
-    public Response updateStructure(@PathParam("id") String id, StructureDTO detailsDTO) {
+    public Response updateStructure(@PathParam("id") String customerId, StructureDTO detailsDTO) {
         try {
-            System.out.println("========== INICIANDO UPDATE COMPLETO STRUCTURE ==========");
+            System.out.println("========== INICIANDO UPDATE COMPLETO ROOFING ==========");
             
-            // 1. Atualiza campos principais e deleta detalhes antigos
-            String structureId = structureService.updateStructure(id, detailsDTO);
-
-            // 2. Recria todos os detalhes com os novos dados
+            String structureId = structureService.updateStructure(customerId, detailsDTO);
             structureService.saveAllPhaseDetails(structureId, detailsDTO);
             
             System.out.println("========== UPDATE CONCLUÍDO ==========");
 
             return Response.status(Response.Status.NO_CONTENT).build();
-
+            
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao atualizar: " + e.getMessage())
-                    .build();
+                           .entity("Erro ao atualizar: " + e.getMessage())
+                           .build();
         }
     }
 

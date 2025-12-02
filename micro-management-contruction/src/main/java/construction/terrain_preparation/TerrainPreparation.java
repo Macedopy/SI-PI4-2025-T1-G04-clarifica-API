@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import construction.structure.entity_external.StructureExecutedService;
 import construction.structure.entity_external.StructureMaterial;
 import construction.structure.entity_external.StructurePhotoRecord;
@@ -39,7 +41,8 @@ import jakarta.persistence.Table;
     private String contractor;
 
     @OneToOne
-    @JoinColumn(name = "user_id") 
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "terrainPreparation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
