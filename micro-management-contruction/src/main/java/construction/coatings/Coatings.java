@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -30,7 +29,7 @@ public class Coatings extends PanacheEntityBase {
     private String contractor;
 
     @OneToOne
-    @JoinColumn(name = "user_id") 
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 

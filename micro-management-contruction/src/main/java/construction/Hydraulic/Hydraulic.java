@@ -30,7 +30,7 @@ public class Hydraulic extends PanacheEntityBase {
     private String contractor;
 
     @OneToOne
-    @JoinColumn(name = "user_id") 
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 

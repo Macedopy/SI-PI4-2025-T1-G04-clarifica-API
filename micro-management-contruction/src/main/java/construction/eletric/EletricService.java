@@ -122,6 +122,6 @@ public class EletricService {
     }
 
     public Optional<Eletric> getEletricByCustomerId(String customerId) {
-        return eletricRepository.find("userId", customerId).firstResultOptional();
+        return eletricRepository.find("user.id", customerId).firstResultOptional();
     }
 }

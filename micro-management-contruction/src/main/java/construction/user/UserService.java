@@ -1,6 +1,7 @@
 package construction.user;
 
 import construction.foundation.Foundation;
+import construction.hydraulic.Hydraulic;
 import construction.structure.Structure;
 import construction.terrain_preparation.TerrainPreparation;
 import construction.eletric.Eletric;
@@ -123,6 +124,14 @@ public class UserService {
         terrainPreparation.setUser(user);
         terrainPreparation.persist();
         user.setTerrainPreparation(terrainPreparation);
+
+        Hydraulic hydraulic = new Hydraulic();
+        hydraulic.setId(UUID.randomUUID().toString());
+        hydraulic.setName("Hydraulic - " + contractorName);
+        hydraulic.setContractor(contractorName);
+        hydraulic.setUser(user);
+        hydraulic.persist();
+        user.setHydraulic(hydraulic);
 
     }
 

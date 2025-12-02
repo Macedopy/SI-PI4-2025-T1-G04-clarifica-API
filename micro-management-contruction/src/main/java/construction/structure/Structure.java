@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     private String contractor;
 
     @OneToOne
-    @JoinColumn(name = "user_id") 
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
 

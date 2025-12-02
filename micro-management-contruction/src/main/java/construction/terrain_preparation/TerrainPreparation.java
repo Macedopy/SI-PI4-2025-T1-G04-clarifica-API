@@ -31,7 +31,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity @Table(name = "terrainPreparation") public class TerrainPreparation extends PanacheEntityBase {
-        @Id
+    @Id
     private String id;
 
     @Column(nullable = false)
@@ -42,7 +42,7 @@ import jakarta.persistence.Table;
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore 
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "terrainPreparation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

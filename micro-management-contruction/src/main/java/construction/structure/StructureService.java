@@ -2,8 +2,10 @@ package construction.structure;
 
 import java.util.Optional;
 
+import construction.roofing.Roofing;
 import construction.structure.entity_external.*;
 import construction.terrain_preparation.TerrainPreparation;
+import construction.user.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -29,9 +31,16 @@ public class StructureService {
     }
 
     @Transactional
-    public String updateStructure(String structureId, StructureDTO dto) {
-        Structure structure = structureRepository.findByIdOptional(structureId)
-            .orElseThrow(() -> new NotFoundException("Structure not found for ID: " + structureId));
+    public String updateStructure(String userId, StructureDTO dto) {
+        User user = User.findById(userId);
+        if (user == null) {
+            throw new NotFoundException("User not found for ID: " + userId);
+        }
+
+        Structure structure = user.getStructure();
+        if (structure == null) {
+            throw new NotFoundException("Roofing not found for User ID: " + userId + ". Cannot perform update.");
+        }
         
         if (dto.getPhaseName() != null && !dto.getPhaseName().isBlank()) {
             structure.setName(dto.getPhaseName());
@@ -40,7 +49,6 @@ public class StructureService {
             structure.setContractor(dto.getContractor());
         }
         
-        // Deleta todos os detalhes antigos antes de recriar
         deleteAllPhaseDetails(structure.getId());
         
         return structure.getId();
@@ -117,6 +125,6 @@ public class StructureService {
     }
 
     public Optional<Structure> getTerrainStructureByCustomerId(String customerId) {
-        return structureRepository.find("userId", customerId).firstResultOptional();
+        return structureRepository.find("user.id", customerId).firstResultOptional();
     }
 }

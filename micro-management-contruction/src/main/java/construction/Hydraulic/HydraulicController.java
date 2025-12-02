@@ -103,12 +103,12 @@ public class HydraulicController {
     @GET
     @Path("/{id}")
     public Response getHydraulic(@PathParam("id") String id) {
-        Optional<Hydraulic> hydraulic = hydraulicService.getHydrauliconByCustomerId(id);
-        
+        Optional<Hydraulic> hydraulic = hydraulicService.getHydraulicByCustomerId(id);
+
         if (hydraulic.isPresent()) {
             return Response.ok(hydraulic.get()).build();
         }
-        
+
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 

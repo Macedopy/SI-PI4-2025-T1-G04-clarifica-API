@@ -97,6 +97,6 @@ public class FinishingService {
     }
 
     public Optional<Finishing> getFinishingByCustomerId(String customerId) {
-        return finishingRepository.find("userId", customerId).firstResultOptional();
+        return finishingRepository.find("user.id", customerId).firstResultOptional();
     }
 }

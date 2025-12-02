@@ -5,6 +5,8 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "terrain_preparation_general_information")
 public class TerrainPreparationGeneralInformation extends PanacheEntityBase {
@@ -18,6 +20,7 @@ public class TerrainPreparationGeneralInformation extends PanacheEntityBase {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "terrainPreparation_id")
+    @JsonIgnore
     private TerrainPreparation terrainPreparation;
     
     @Column(name = "endereco", length = 500)

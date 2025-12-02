@@ -122,6 +122,6 @@ public class CoatingsService {
     }
 
     public Optional<Coatings> getCoatingsByCustomerId(String customerId) {
-        return coatingsRepository.find("user_id", customerId).firstResultOptional();
+        return coatingsRepository.find("user.id", customerId).firstResultOptional();
     }
 }
