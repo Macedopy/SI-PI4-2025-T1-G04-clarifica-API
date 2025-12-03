@@ -13,7 +13,7 @@ public class TerrainPreparationDTO {
     
     private String phaseName;
     private String contractor;
-    private GeneralInfoDTO geral;
+    private List<GeneralInfoDTO> geral;
     
     private List<TeamMemberDTO> equipe;
     private List<ExecutedServiceDTO> servicos;
@@ -38,11 +38,11 @@ public class TerrainPreparationDTO {
         this.contractor = contractor;
     }
 
-    public GeneralInfoDTO getGeral() {
+    public List<GeneralInfoDTO> getGeral() {
         return geral;
     }
 
-    public void setGeral(GeneralInfoDTO geral) {
+    public void setGeral(List<GeneralInfoDTO> geral) {
         this.geral = geral;
     }
 

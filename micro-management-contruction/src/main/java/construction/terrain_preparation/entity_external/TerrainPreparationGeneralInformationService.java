@@ -33,10 +33,13 @@ public class TerrainPreparationGeneralInformationService {
     }
 
     @Transactional
-    public void save(GeneralInfoDTO dto, String phaseId, TerrainPreparation terrainPreparation) {
-        if (dto == null) return;
+    public void saveAll(List<GeneralInfoDTO> dtos, String phaseId, TerrainPreparation terrainPreparation) {
+        if (dtos == null || dtos.isEmpty()) return;
 
-        TerrainPreparationGeneralInformation entity = mapToEntity(dto, phaseId, terrainPreparation);
-        TerrainPreparationGeneralInformation.persist(entity);
+        List<TerrainPreparationGeneralInformation> entities = dtos.stream()
+            .map(dto -> mapToEntity(dto, phaseId, terrainPreparation))
+            .collect(Collectors.toList());
+
+        TerrainPreparationGeneralInformation.persist(entities);
     }
 }

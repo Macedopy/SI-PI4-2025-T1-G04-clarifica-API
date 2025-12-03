@@ -75,7 +75,7 @@ public class TerrainPreparationService {
             // ✅ Salva informações gerais como uma entidade de detalhe
             if (detailsDTO.getGeral() != null) {
                 System.out.println("  → Salvando informações gerais...");
-                generalInformationService.save(detailsDTO.getGeral(), phaseId, terrainPreparation);
+                generalInformationService.saveAll(detailsDTO.getGeral(), phaseId, terrainPreparation);
                 System.out.println("  ✓ Informações gerais salvas!");
             }
             

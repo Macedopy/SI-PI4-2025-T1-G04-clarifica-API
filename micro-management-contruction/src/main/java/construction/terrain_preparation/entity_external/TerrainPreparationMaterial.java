@@ -65,7 +65,7 @@ public class TerrainPreparationMaterial extends PanacheEntityBase {
     public void setId(String id) { this.id = id; }
 
     public TerrainPreparation getTerrainPreparation() { return terrainPreparation; }
-    public void setTerrainPreparation(TerrainPreparation structure) { this.terrainPreparation = terrainPreparation; }
+    public void setTerrainPreparation(TerrainPreparation terrainPreparation) { this.terrainPreparation = terrainPreparation; }
     
     public String getPhaseId() { return phaseId; }
     public void setPhaseId(String phaseId) { this.phaseId = phaseId; }
