@@ -33,7 +33,7 @@ public class TerrainPreparationGeneralInformation extends PanacheEntityBase {
     private String topografia; // 'plana', 'inclinada', 'acidentada', 'com desnível'
     
     @Column(name = "data_inicio")
-    private LocalDate dataInicio;
+    private String dataInicio;
     
     @Column(name = "responsavel", length = 255)
     private String responsavel;
@@ -90,11 +90,11 @@ public class TerrainPreparationGeneralInformation extends PanacheEntityBase {
         this.topografia = topografia;
     }
 
-    public LocalDate getDataInicio() {
+    public String getDataInicio() {
         return dataInicio;
     }
 
-    public void setDataInicio(LocalDate dataInicio) {
+    public void setDataInicio(String dataInicio) {
         this.dataInicio = dataInicio;
     }
 

@@ -13,7 +13,7 @@ public class TerrainPreparationDTO {
     
     private String phaseName;
     private String contractor;
-    private List<GeneralInfoDTO> geral;
+    private GeneralInfoDTO geral;
     
     private List<TeamMemberDTO> equipe;
     private List<ExecutedServiceDTO> servicos;
@@ -38,11 +38,11 @@ public class TerrainPreparationDTO {
         this.contractor = contractor;
     }
 
-    public List<GeneralInfoDTO> getGeral() {
+    public GeneralInfoDTO getGeral() {
         return geral;
     }
 
-    public void setGeral(List<GeneralInfoDTO> geral) {
+    public void setGeral(GeneralInfoDTO geral) {
         this.geral = geral;
     }
 
@@ -91,7 +91,7 @@ public class TerrainPreparationDTO {
         private String endereco;
         private Double areaTerreno;
         private String topografia; // 'plana', 'inclinada', 'acidentada', 'com desnível'
-        private LocalDate dataInicio;
+        private String dataInicio;
         private String responsavel;
         private String observacao;
 
@@ -120,11 +120,11 @@ public class TerrainPreparationDTO {
             this.topografia = topografia;
         }
 
-        public LocalDate getDataInicio() {
+        public String getDataInicio() {
             return dataInicio;
         }
 
-        public void setDataInicio(LocalDate dataInicio) {
+        public void setDataInicio(String dataInicio) {
             this.dataInicio = dataInicio;
         }
 

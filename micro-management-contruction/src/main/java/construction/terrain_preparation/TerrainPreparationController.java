@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import java.util.UUID;
+import construction.terrain_preparation.entity_external.TerrainPreparationExecutedServiceService;
 
 @Path("/terrain-preparation")
 // REMOVIDO @Produces e @Consumes DAQUI PARA EVITAR ERROS
@@ -101,6 +102,31 @@ public class TerrainPreparationController {
         
         System.out.println(">>> NADA ENCONTRADO NO BANCO PARA O ID: " + id);
         return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    
+    // 2. Injete o Service específico dos serviços executados
+    @Inject
+    TerrainPreparationExecutedServiceService executedServiceService;
+
+    // ... (outros métodos existentes) ...
+
+    // ============== DELETE SERVICE (DELETE) ==============
+    
+    @DELETE
+    @Path("/service/{serviceId}")
+    @Transactional
+    public Response deleteExecutedService(@PathParam("serviceId") String serviceId) {
+        System.out.println(">>> DELETANDO SERVIÇO ID: " + serviceId);
+        
+        boolean deleted = executedServiceService.deleteService(serviceId);
+
+        if (deleted) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity("Serviço não encontrado para exclusão.")
+                           .build();
+        }
     }
     
     // ... (DTOs iguais) ...

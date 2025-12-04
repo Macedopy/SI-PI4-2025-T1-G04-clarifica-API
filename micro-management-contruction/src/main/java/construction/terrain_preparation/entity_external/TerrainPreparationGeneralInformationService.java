@@ -5,9 +5,7 @@ import construction.terrain_preparation.TerrainPreparationDTO.GeneralInfoDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TerrainPreparationGeneralInformationService {
@@ -33,13 +31,10 @@ public class TerrainPreparationGeneralInformationService {
     }
 
     @Transactional
-    public void saveAll(List<GeneralInfoDTO> dtos, String phaseId, TerrainPreparation terrainPreparation) {
-        if (dtos == null || dtos.isEmpty()) return;
+    public void save(GeneralInfoDTO dto, String phaseId, TerrainPreparation terrainPreparation) {
+        if (dto == null) return;
 
-        List<TerrainPreparationGeneralInformation> entities = dtos.stream()
-            .map(dto -> mapToEntity(dto, phaseId, terrainPreparation))
-            .collect(Collectors.toList());
-
-        TerrainPreparationGeneralInformation.persist(entities);
+        TerrainPreparationGeneralInformation entity = mapToEntity(dto, phaseId, terrainPreparation);
+        repository.persist(entity);
     }
 }

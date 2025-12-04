@@ -71,4 +71,10 @@ public class TerrainPreparationExecutedServiceService {
         
         TerrainPreparationExecutedService.persist(entities);
     }
+
+    @Transactional
+    public boolean deleteService(String id) {
+        // Retorna true se deletou, false se não existia
+        return TerrainPreparationExecutedService.deleteById(id);
+    }
 }
