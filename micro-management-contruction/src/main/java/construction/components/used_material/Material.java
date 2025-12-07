@@ -1,3 +1,4 @@
+//Responsável: Bruno Martins
 package construction.components.used_material;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;

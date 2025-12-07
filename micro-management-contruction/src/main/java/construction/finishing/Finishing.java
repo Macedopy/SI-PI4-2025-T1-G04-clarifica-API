@@ -1,3 +1,5 @@
+//Responsável: Bruno Martins (Tudo do finishing)
+
 package construction.finishing;
 
 import construction.finishing.entity_external.FinishingExecutedService;

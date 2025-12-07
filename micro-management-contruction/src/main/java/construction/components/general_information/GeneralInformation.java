@@ -1,3 +1,5 @@
+//Responsável: Bruno Macedo
+
 package construction.components.general_information;
 
 import jakarta.persistence.*;

@@ -1,3 +1,4 @@
+//Responsável: Bruno Martins
 package construction.coatings;
 
 import java.util.Optional;

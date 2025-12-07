@@ -1,3 +1,4 @@
+//Responsável: Bruno Martins (Tudo do eletric)
 package construction.eletric;
 
 import construction.eletric.entity_external.EletricExecutedService;

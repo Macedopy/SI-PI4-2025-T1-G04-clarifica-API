@@ -1,3 +1,4 @@
+//Responsável: Bruno Martins
 package construction.components.machinery;
 
 import jakarta.persistence.*;

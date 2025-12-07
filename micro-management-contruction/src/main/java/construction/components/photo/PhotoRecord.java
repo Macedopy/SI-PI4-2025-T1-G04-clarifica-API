@@ -1,3 +1,4 @@
+//responsável: Bruno Martins
 package construction.components.photo;
 
 import jakarta.persistence.*;

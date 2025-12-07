@@ -1,3 +1,5 @@
+//Responsável: Bruno Macedo (Tudo do foundation)
+
 package construction.foundation;
 
 import construction.foundation.entity_external.FoundationExecutedService;
@@ -8,6 +10,7 @@ import construction.foundation.entity_external.FoundationTeamMember;
 import construction.foundation.entity_external.FoundationTool;
 import construction.user.User;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

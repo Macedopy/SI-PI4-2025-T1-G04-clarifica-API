@@ -1,3 +1,5 @@
+//Responsável: Bruno Martins (Tudo do masonry)
+
 package construction.masonry;
 
 import construction.foundation.entity_external.FoundationExecutedService;

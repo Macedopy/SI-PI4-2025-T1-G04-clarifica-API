@@ -1,3 +1,5 @@
+//Responsável: Bruno Macedo (Tudo do terrain preparation)
+
 package construction.terrain_preparation;
 
 import java.util.ArrayList;

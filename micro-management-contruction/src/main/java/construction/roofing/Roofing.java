@@ -1,3 +1,5 @@
+//Responsável: Bruno Martins (Tudo do roofing)
+
 package construction.roofing;
 
 import construction.roofing.entity_external.RoofingExecutedService;

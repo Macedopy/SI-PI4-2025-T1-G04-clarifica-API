@@ -1,3 +1,4 @@
+//responsável: Caue Kenzo
 package construction.components.team_present;
 
 import jakarta.persistence.*;

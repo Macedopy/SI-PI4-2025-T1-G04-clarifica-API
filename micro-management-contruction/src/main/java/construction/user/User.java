@@ -1,3 +1,5 @@
+//Responsável: Bruno Macedo (Tudo do user)
+
 package construction.user;
 
 import jakarta.persistence.*;

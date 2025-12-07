@@ -1,3 +1,5 @@
+//Responsável: Bruno Macedo
+
 package construction.service;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
