@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -17,6 +18,11 @@ public class Material extends PanacheEntityBase {
 
     @Id
     private String id;
+
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+    @jakarta.persistence.JoinColumn(name = "phase_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private construction.core.Phase phase;
 
     @NotBlank(message = "Name is required")
     @Column(nullable = false)
@@ -47,6 +53,14 @@ public class Material extends PanacheEntityBase {
 
     @Column(name = "urgency")
     private String urgency;
+
+    public construction.core.Phase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(construction.core.Phase phase) {
+        this.phase = phase;
+    }
 
     public String getId() {
         return id;

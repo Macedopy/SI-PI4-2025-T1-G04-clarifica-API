@@ -1,20 +1,12 @@
-//Responsável: Bruno Macedo (Tudo do user)
-
 package construction.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import construction.coatings.Coatings;
-import construction.eletric.Eletric;
-import construction.finishing.Finishing;
-import construction.foundation.Foundation;
-import construction.hydraulic.Hydraulic;
-import construction.masonry.Masonry;
-import construction.roofing.Roofing;
-import construction.structure.Structure;
-import construction.terrain_preparation.TerrainPreparation;
+import construction.core.Construction;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -44,38 +36,14 @@ public class User extends PanacheEntityBase {
     @Column(nullable = false)
     private UserRole role;
 
-    // Relacionamentos com as fases
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Foundation foundation;
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Construction> ownedConstructions = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Structure structure;
+    @ManyToMany(mappedBy = "clients")
+    private List<Construction> clientConstructions = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Masonry masonry;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Eletric electrical;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Hydraulic hydraulic;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Coatings coatings;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Finishing finishing;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Roofing roofing;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Eletric eletric;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private TerrainPreparation terrainPreparation;
-
-    // Getters e Setters básicos
+    @ManyToMany(mappedBy = "masterBuilders")
+    private List<Construction> managedConstructions = new ArrayList<>();
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -98,79 +66,14 @@ public class User extends PanacheEntityBase {
     public UserRole getRole() { return role; }
     public void setRole(UserRole role) { this.role = role; }
 
-    // ADICIONAR Getters e Setters das fases
+    public List<Construction> getOwnedConstructions() { return ownedConstructions; }
+    public void setOwnedConstructions(List<Construction> ownedConstructions) { this.ownedConstructions = ownedConstructions; }
 
-    public Foundation getFoundation() { 
-        return foundation; 
-    }
-    
-    public void setFoundation(Foundation foundation) { 
-        this.foundation = foundation; 
-    }
+    public List<Construction> getClientConstructions() { return clientConstructions; }
+    public void setClientConstructions(List<Construction> clientConstructions) { this.clientConstructions = clientConstructions; }
 
-    public TerrainPreparation getTerrainPreparation() { 
-        return terrainPreparation; 
-    }
-    
-    public void setTerrainPreparation(TerrainPreparation terrainPreparation) { 
-        this.terrainPreparation = terrainPreparation; 
-    }
-
-    public Hydraulic getHydraulic() { 
-        return hydraulic; 
-    }
-    
-    public void setHydraulic(Hydraulic hydraulic) { 
-        this.hydraulic = hydraulic; 
-    }
-
-    public Structure getStructure() { 
-        return structure; 
-    }
-    
-    public void setStructure(Structure structure) { 
-        this.structure = structure; 
-    }
-
-    public Finishing getFinishing() { 
-        return finishing; 
-    }
-    
-    public void setFinishing(Finishing finishing) { 
-        this.finishing = finishing; 
-    }
-
-    public Masonry getMasonry() { 
-        return masonry; 
-    }
-    
-    public void setMasonry(Masonry masonry) { 
-        this.masonry = masonry; 
-    }
-
-    public Eletric getElectrical() { 
-        return electrical; 
-    }
-    
-    public void setElectrical(Eletric electrical) { 
-        this.electrical = electrical; 
-    }
-
-    public Coatings getCoatings() { 
-        return coatings; 
-    }
-    
-    public void setCoatings(Coatings coatings) { 
-        this.coatings = coatings; 
-    }
-
-    public Roofing getRoofing() { 
-        return roofing; 
-    }
-    
-    public void setRoofing(Roofing roofing) { 
-        this.roofing = roofing; 
-    }
+    public List<Construction> getManagedConstructions() { return managedConstructions; }
+    public void setManagedConstructions(List<Construction> managedConstructions) { this.managedConstructions = managedConstructions; }
 
     public String fullName() {
         return firstName + " " + lastName;

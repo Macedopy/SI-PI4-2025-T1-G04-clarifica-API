@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import construction.core.Phase;
 
 @Entity
 @Table(name = "machinery")
@@ -13,8 +15,10 @@ public class Machinery extends PanacheEntityBase {
     @Id
     private String id;
 
-    @Column(name = "phase_id", nullable = false)
-    private String phaseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "phase_id", nullable = false)
+    @JsonIgnore
+    private Phase phase;
 
     @NotBlank(message = "Name is required")
     @Column(nullable = false)
@@ -73,12 +77,12 @@ public class Machinery extends PanacheEntityBase {
         this.id = id;
     }
 
-    public String getPhaseId() {
-        return phaseId;
+    public Phase getPhase() {
+        return phase;
     }
 
-    public void setPhaseId(String phaseId) {
-        this.phaseId = phaseId;
+    public void setPhase(Phase phase) {
+        this.phase = phase;
     }
 
     public String getName() {

@@ -9,7 +9,7 @@ public enum MaterialCategory {
     STEEL("Ferro"),
     BRICK("Tijolo"),
     WOOD("Madeira"),
-    ELECTRICAL("Eletrica"),
+    ELECTRICAL("Elétrica"),
     PLUMBING("Hidráulica"),
     OTHER("Outros");
 

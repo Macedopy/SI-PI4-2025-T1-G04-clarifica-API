@@ -4,6 +4,8 @@ package construction.components.team_present;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import construction.core.Phase;
 
 @Entity
 @Table(name = "team_members")
@@ -12,8 +14,10 @@ public class TeamMember extends PanacheEntityBase {
     @Id
     private String id;
 
-    @Column(name = "phase_id", nullable = false)
-    private String phaseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "phase_id", nullable = false)
+    @JsonIgnore
+    private Phase phase;
 
     @Column(nullable = false)
     private String name;
@@ -43,12 +47,12 @@ public class TeamMember extends PanacheEntityBase {
         this.id = id;
     }
 
-    public String getPhaseId() {
-        return phaseId;
+    public Phase getPhase() {
+        return phase;
     }
 
-    public void setPhaseId(String phaseId) {
-        this.phaseId = phaseId;
+    public void setPhase(Phase phase) {
+        this.phase = phase;
     }
 
     public String getName() {

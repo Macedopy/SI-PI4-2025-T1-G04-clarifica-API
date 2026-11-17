@@ -4,6 +4,8 @@ package construction.components.photo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import construction.core.Phase;
 
 @Entity
 @Table(name = "photo_records")
@@ -11,6 +13,11 @@ public class PhotoRecord extends PanacheEntityBase {
 
     @Id
     private String id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "phase_id", nullable = false)
+    @JsonIgnore
+    private Phase phase;
 
     @NotBlank(message = "File path or URL is required")
     @Column(name = "file_path", nullable = false, length = 1000)
@@ -32,6 +39,14 @@ public class PhotoRecord extends PanacheEntityBase {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Phase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(Phase phase) {
+        this.phase = phase;
     }
 
     public String getFilePath() {

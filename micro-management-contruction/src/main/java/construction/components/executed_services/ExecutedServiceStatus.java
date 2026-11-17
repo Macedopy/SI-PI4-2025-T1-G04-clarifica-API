@@ -7,11 +7,7 @@ public enum ExecutedServiceStatus {
     PLANNED("planejado"),
     STARTED("iniciado"),
     IN_PROGRESS("andamento"),
-    COMPLETED("concluido"),
-    CONCLUIDO("concluido"),
-    EM_ANDAMENTO("andamento"),
-    PLANEJADO("planejado"),
-    INICIADO("iniciado");
+    COMPLETED("concluido");
 
     private final String displayName;
 

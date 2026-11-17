@@ -5,8 +5,11 @@ package construction.components.general_information;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "general_information")
@@ -15,8 +18,8 @@ public class GeneralInformation extends PanacheEntityBase {
     @Id
     private String id;
 
-    @Column(name = "phase_id", nullable = false, unique = true)
-    private String phaseId;
+    @Column(name = "construction_id", nullable = false, unique = true)
+    private String constructionId;
 
     @NotBlank(message = "Address is required")
     @Column(nullable = false, length = 500)
@@ -26,9 +29,14 @@ public class GeneralInformation extends PanacheEntityBase {
     @Column(name = "land_area", nullable = false)
     private double landArea;
 
+    @Pattern(
+        regexp = "plana|inclinada|acidentada|com desnível",
+        message = "Topography must be one of: plana, inclinada, acidentada, com desnível"
+    )
     @Column(nullable = false)
     private String topography;
 
+    @NotNull(message = "Start date is required")
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
@@ -38,6 +46,10 @@ public class GeneralInformation extends PanacheEntityBase {
     @Column(length = 1000)
     private String observations;
 
+    public GeneralInformation() {
+        this.id = UUID.randomUUID().toString();
+    }
+
     public String getId() {
         return id;
     }
@@ -46,12 +58,12 @@ public class GeneralInformation extends PanacheEntityBase {
         this.id = id;
     }
 
-    public String getPhaseId() {
-        return phaseId;
+    public String getConstructionId() {
+        return constructionId;
     }
 
-    public void setPhaseId(String phaseId) {
-        this.phaseId = phaseId;
+    public void setConstructionId(String constructionId) {
+        this.constructionId = constructionId;
     }
 
     public String getAddress() {

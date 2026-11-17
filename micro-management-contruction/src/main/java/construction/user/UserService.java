@@ -1,20 +1,8 @@
 package construction.user;
 
-import construction.foundation.Foundation;
-import construction.hydraulic.Hydraulic;
-import construction.structure.Structure;
-import construction.terrain_preparation.TerrainPreparation;
-import construction.eletric.Eletric;
-import construction.finishing.Finishing;
-import construction.masonry.Masonry;
-import construction.roofing.Roofing;
-import construction.coatings.Coatings;
-
 import java.util.UUID;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import clarifica.infrastructure.Client.ManipulationClient; 
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -29,16 +17,18 @@ public class UserService {
 
     @Transactional
     public UserDTO createUser(UserDTO userDTO) {
-        User user = new User();
-
-        String tokenDoServidor = ManipulationClient.obterTokenDoServidor();
-
-        if (tokenDoServidor != null && !tokenDoServidor.equals("ERRO_TOKEN") && !tokenDoServidor.isEmpty()) {
-            user.setId(tokenDoServidor);
-        } else {
-            System.out.println("Aviso: Não foi possível conectar ao servidor de IDs. Usando UUID local.");
-            user.setId(UUID.randomUUID().toString().split("-")[0]);
+        // Check if user with same CPF already exists
+        if (userRepository.find("cpf", userDTO.getPersonalInformation().getCpf()).count() > 0) {
+            throw new IllegalArgumentException("User with CPF " + userDTO.getPersonalInformation().getCpf() + " already exists.");
         }
+
+        // Check if user with same email already exists
+        if (userRepository.find("email", userDTO.getPersonalInformation().getEmail()).count() > 0) {
+            throw new IllegalArgumentException("User with email " + userDTO.getPersonalInformation().getEmail() + " already exists.");
+        }
+
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
 
         user.setFirstName(userDTO.getPersonalInformation().getFirstName());
         user.setLastName(userDTO.getPersonalInformation().getLastName());
@@ -49,90 +39,7 @@ public class UserService {
 
         userRepository.persist(user);
 
-        createEmptyPhases(user);
-
         return mapToDTO(user);
-    }
-
-    private void createEmptyPhases(User user) {
-        String contractorName = user.fullName();
-
-        // Foundation
-        Foundation foundation = new Foundation();
-        foundation.setId(UUID.randomUUID().toString());
-        foundation.setName("Foundation - " + contractorName);
-        foundation.setContractor(contractorName);
-        foundation.setUser(user);
-        foundation.persist();
-        user.setFoundation(foundation);
-
-        // Structure
-        Structure structure = new Structure();
-        structure.setId(UUID.randomUUID().toString());
-        structure.setName("Structure - " + contractorName);
-        structure.setContractor(contractorName);
-        structure.setUser(user);
-        structure.persist();
-        user.setStructure(structure);
-
-        // Eletric
-        Eletric eletric = new Eletric();
-        eletric.setId(UUID.randomUUID().toString());
-        eletric.setName("Eletric - " + contractorName);
-        eletric.setContractor(contractorName);
-        eletric.setUser(user);
-        eletric.persist();
-        user.setElectrical(eletric);
-
-        Masonry masonry = new Masonry();
-        masonry.setId(UUID.randomUUID().toString());
-        masonry.setName("Masonry - " + contractorName);
-        masonry.setContractor(contractorName);
-        masonry.setUser(user);
-        masonry.persist();
-        user.setMasonry(masonry);
-
-        // Coatings
-        Coatings coatings = new Coatings();
-        coatings.setId(UUID.randomUUID().toString());
-        coatings.setName("Coatings - " + contractorName);
-        coatings.setContractor(contractorName);
-        coatings.setUser(user);
-        coatings.persist();
-        user.setCoatings(coatings);
-
-        Roofing roofing = new Roofing();
-        roofing.setId(UUID.randomUUID().toString());
-        roofing.setName("Roofing - " + contractorName);
-        roofing.setContractor(contractorName);
-        roofing.setUser(user);
-        roofing.persist();
-        user.setRoofing(roofing);
-
-        Finishing finishing = new Finishing();
-        finishing.setId(UUID.randomUUID().toString());
-        finishing.setName("Finishing - " + contractorName);
-        finishing.setContractor(contractorName);
-        finishing.setUser(user);
-        finishing.persist();
-        user.setFinishing(finishing); 
-
-        TerrainPreparation terrainPreparation = new TerrainPreparation();
-        terrainPreparation.setId(UUID.randomUUID().toString());
-        terrainPreparation.setName("Terrain Preparation - " + contractorName);
-        terrainPreparation.setContractor(contractorName);
-        terrainPreparation.setUser(user);
-        terrainPreparation.persist();
-        user.setTerrainPreparation(terrainPreparation);
-
-        Hydraulic hydraulic = new Hydraulic();
-        hydraulic.setId(UUID.randomUUID().toString());
-        hydraulic.setName("Hydraulic - " + contractorName);
-        hydraulic.setContractor(contractorName);
-        hydraulic.setUser(user);
-        hydraulic.persist();
-        user.setHydraulic(hydraulic);
-
     }
 
     @Transactional
@@ -145,9 +52,11 @@ public class UserService {
 
     @Transactional
     public UserDTO customerById(String id) {
-        return userRepository.findByIdOptional(id)
-            .map(this::mapToDTO)
-            .orElseThrow(() -> new NotFoundException("Cliente com ID " + id + " não encontrado."));
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw new NotFoundException("Usuário com ID " + id + " não encontrado.");
+        }
+        return mapToDTO(user);
     }
 
     private UserDTO mapToDTO(User user) {
