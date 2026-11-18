@@ -159,6 +159,12 @@ public class ConstructionController {
             .map(u -> new ConstructionDTO.UserInfoDTO(u.getId(), u.fullName(), u.getEmail()))
             .collect(Collectors.toList()));
 
+        dto.setTemplateId(c.getTemplateId());
+        dto.setCountryCode(c.getCountryCode());
+        dto.setCurrencyCode(c.getCurrencyCode());
+        dto.setLanguage(c.getLanguage());
+        dto.setMeasurementSystem(c.getMeasurementSystem());
+
         // Adiciona o progresso calculado
         try {
             dto.setOverallProgress(dashboardService.calculateDashboard(c.getId()).getOverallProgress());

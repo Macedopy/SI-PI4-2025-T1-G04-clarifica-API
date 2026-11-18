@@ -11,6 +11,11 @@ public class ConstructionDTO {
     private List<UserInfoDTO> clients;
     private List<UserInfoDTO> masterBuilders;
     private int overallProgress;
+    private String templateId;
+    private String countryCode;
+    private String currencyCode;
+    private String language;
+    private String measurementSystem;
 
     public ConstructionDTO() {}
 
@@ -38,6 +43,21 @@ public class ConstructionDTO {
 
     public int getOverallProgress() { return overallProgress; }
     public void setOverallProgress(int overallProgress) { this.overallProgress = overallProgress; }
+
+    public String getTemplateId() { return templateId; }
+    public void setTemplateId(String templateId) { this.templateId = templateId; }
+
+    public String getCountryCode() { return countryCode; }
+    public void setCountryCode(String countryCode) { this.countryCode = countryCode; }
+
+    public String getCurrencyCode() { return currencyCode; }
+    public void setCurrencyCode(String currencyCode) { this.currencyCode = currencyCode; }
+
+    public String getLanguage() { return language; }
+    public void setLanguage(String language) { this.language = language; }
+
+    public String getMeasurementSystem() { return measurementSystem; }
+    public void setMeasurementSystem(String measurementSystem) { this.measurementSystem = measurementSystem; }
 
     public static class UserInfoDTO {
         public String id;
