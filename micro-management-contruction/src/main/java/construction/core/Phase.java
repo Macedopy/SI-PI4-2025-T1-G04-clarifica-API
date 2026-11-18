@@ -11,6 +11,8 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -28,6 +30,30 @@ public class Phase extends PanacheEntityBase {
 
     @Column(name = "icon", length = 50)
     private String icon;
+
+    @Column(name = "template_phase_id", length = 50)
+    private String templatePhaseId;
+
+    @Column(name = "status")
+    private String status = "not_started";
+
+    @Column(name = "planned_start_date")
+    private java.time.LocalDate plannedStartDate;
+
+    @Column(name = "planned_end_date")
+    private java.time.LocalDate plannedEndDate;
+
+    @Column(name = "actual_start_date")
+    private java.time.LocalDate actualStartDate;
+
+    @Column(name = "actual_end_date")
+    private java.time.LocalDate actualEndDate;
+
+    @Column(name = "budget_amount")
+    private java.math.BigDecimal budgetAmount = java.math.BigDecimal.ZERO;
+
+    @Column(name = "currency_code", length = 3)
+    private String currencyCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "construction_id", nullable = false)
@@ -68,6 +94,30 @@ public class Phase extends PanacheEntityBase {
 
     public String getIcon() { return icon; }
     public void setIcon(String icon) { this.icon = icon; }
+
+    public String getTemplatePhaseId() { return templatePhaseId; }
+    public void setTemplatePhaseId(String templatePhaseId) { this.templatePhaseId = templatePhaseId; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public java.time.LocalDate getPlannedStartDate() { return plannedStartDate; }
+    public void setPlannedStartDate(java.time.LocalDate plannedStartDate) { this.plannedStartDate = plannedStartDate; }
+
+    public java.time.LocalDate getPlannedEndDate() { return plannedEndDate; }
+    public void setPlannedEndDate(java.time.LocalDate plannedEndDate) { this.plannedEndDate = plannedEndDate; }
+
+    public java.time.LocalDate getActualStartDate() { return actualStartDate; }
+    public void setActualStartDate(java.time.LocalDate actualStartDate) { this.actualStartDate = actualStartDate; }
+
+    public java.time.LocalDate getActualEndDate() { return actualEndDate; }
+    public void setActualEndDate(java.time.LocalDate actualEndDate) { this.actualEndDate = actualEndDate; }
+
+    public java.math.BigDecimal getBudgetAmount() { return budgetAmount; }
+    public void setBudgetAmount(java.math.BigDecimal budgetAmount) { this.budgetAmount = budgetAmount; }
+
+    public String getCurrencyCode() { return currencyCode; }
+    public void setCurrencyCode(String currencyCode) { this.currencyCode = currencyCode; }
 
     public Construction getConstruction() { return construction; }
     public void setConstruction(Construction construction) { this.construction = construction; }
