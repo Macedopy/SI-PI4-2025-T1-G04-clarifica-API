@@ -105,6 +105,7 @@ public class ConstructionController {
             item.put("id", phase.getId());
             item.put("nome", phase.getName());
             item.put("name", phase.getName());
+            item.put("templatePhaseId", phase.getTemplatePhaseId());
             item.put("contractor", phase.getContractor());
             item.put("icon", phase.getIcon());
             item.put("components", componentsOf(phase.getId()));
