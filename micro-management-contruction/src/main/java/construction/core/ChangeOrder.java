@@ -1,6 +1,5 @@
 package construction.core;
 
-import construction.core.Phase;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -12,6 +11,7 @@ import java.util.UUID;
 public class ChangeOrder extends PanacheEntityBase {
 
     @Id
+    @Column(name = "id")
     private String id;
 
     @Column(name = "construction_id", nullable = false)
@@ -23,7 +23,7 @@ public class ChangeOrder extends PanacheEntityBase {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "price_change", nullable = false)
@@ -46,7 +46,6 @@ public class ChangeOrder extends PanacheEntityBase {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

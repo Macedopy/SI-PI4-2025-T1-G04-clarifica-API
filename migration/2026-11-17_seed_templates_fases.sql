@@ -13,32 +13,32 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================
 -- Fases do Template Brasil (IDs estáveis, nomes traduzidos via JSON)
 -- ============================================================
-INSERT INTO template_phases (template_id, phase_id, name_key, icon, sequence, is_optional, is_active, components)
+INSERT INTO template_phases (id, template_id, phase_id, name_key, icon, sequence, is_optional, is_active, components)
 VALUES
-  ('11111111-1111-1111-1111-111111111111', 'preparacao_terreno', 'phase.preparacao_terreno', 'trees', 1, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('11111111-1111-1111-1111-111111111111', 'fundacao', 'phase.fundacao', 'layers', 2, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('11111111-1111-1111-1111-111111111111', 'estrutura', 'phase.estrutura', 'building-2', 3, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('11111111-1111-1111-1111-111111111111', 'alvenaria', 'phase.alvenaria', 'brick-wall', 4, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('11111111-1111-1111-1111-111111111111', 'instalacoes_eletricas', 'phase.instalacoes_eletricas', 'zap', 5, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('11111111-1111-1111-1111-111111111111', 'instalacoes_hidraulicas', 'phase.instalacoes_hidraulicas', 'droplets', 6, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('11111111-1111-1111-1111-111111111111', 'revestimentos', 'phase.revestimentos', 'ruler', 7, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('11111111-1111-1111-1111-111111111111', 'acabamentos', 'phase.acabamentos', 'paint-bucket', 8, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]')
+  ('33333333-3333-3333-3333-333333333331', '11111111-1111-1111-1111-111111111111', 'preparacao_terreno', 'phase.preparacao_terreno', 'trees', 1, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('33333333-3333-3333-3333-333333333332', '11111111-1111-1111-1111-111111111111', 'fundacao', 'phase.fundacao', 'layers', 2, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', 'estrutura', 'phase.estrutura', 'building-2', 3, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('33333333-3333-3333-3333-333333333334', '11111111-1111-1111-1111-111111111111', 'alvenaria', 'phase.alvenaria', 'brick-wall', 4, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('33333333-3333-3333-3333-333333333335', '11111111-1111-1111-1111-111111111111', 'instalacoes_eletricas', 'phase.instalacoes_eletricas', 'zap', 5, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('33333333-3333-3333-3333-333333333336', '11111111-1111-1111-1111-111111111111', 'instalacoes_hidraulicas', 'phase.instalacoes_hidraulicas', 'droplets', 6, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('33333333-3333-3333-3333-333333333337', '11111111-1111-1111-1111-111111111111', 'revestimentos', 'phase.revestimentos', 'ruler', 7, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('33333333-3333-3333-3333-333333333338', '11111111-1111-1111-1111-111111111111', 'acabamentos', 'phase.acabamentos', 'paint-bucket', 8, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]')
 ON CONFLICT (template_id, phase_id) DO NOTHING;
 
 -- ============================================================
 -- Fases do Template EUA/Canadá (conforme documento)
 -- ============================================================
-INSERT INTO template_phases (template_id, phase_id, name_key, icon, sequence, is_optional, is_active, components)
+INSERT INTO template_phases (id, template_id, phase_id, name_key, icon, sequence, is_optional, is_active, components)
 VALUES
-  ('22222222-2222-2222-2222-222222222222', 'pre_construction', 'phase.pre_construction', 'home', 1, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'site_preparation', 'phase.site_preparation', 'shovel', 2, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'foundation', 'phase.foundation', 'layers', 3, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'framing', 'phase.framing', 'hard-hat', 4, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'building_envelope', 'phase.building_envelope', 'roof', 5, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'mep_rough_in', 'phase.mep_rough_in', 'zap', 6, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'insulation_drywall', 'phase.insulation_drywall', 'droplets', 7, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'interior_finishes', 'phase.interior_finishes', 'paint-bucket', 8, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'exterior_finishes', 'phase.exterior_finishes', 'brush', 9, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'final_systems_inspections', 'phase.final_systems_inspections', 'alert-triangle', 10, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
-  ('22222222-2222-2222-2222-222222222222', 'closeout_handover', 'phase.closeout_handover', 'package', 11, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]')
+  ('44444444-4444-4444-4444-444444444401', '22222222-2222-2222-2222-222222222222', 'pre_construction', 'phase.pre_construction', 'home', 1, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444402', '22222222-2222-2222-2222-222222222222', 'site_preparation', 'phase.site_preparation', 'shovel', 2, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444403', '22222222-2222-2222-2222-222222222222', 'foundation', 'phase.foundation', 'layers', 3, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444404', '22222222-2222-2222-2222-222222222222', 'framing', 'phase.framing', 'hard-hat', 4, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444405', '22222222-2222-2222-2222-222222222222', 'building_envelope', 'phase.building_envelope', 'roof', 5, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444406', '22222222-2222-2222-2222-222222222222', 'mep_rough_in', 'phase.mep_rough_in', 'zap', 6, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444407', '22222222-2222-2222-2222-222222222222', 'insulation_drywall', 'phase.insulation_drywall', 'droplets', 7, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444408', '22222222-2222-2222-2222-222222222222', 'interior_finishes', 'phase.interior_finishes', 'paint-bucket', 8, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444409', '22222222-2222-2222-2222-222222222222', 'exterior_finishes', 'phase.exterior_finishes', 'brush', 9, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444410', '22222222-2222-2222-2222-222222222222', 'final_systems_inspections', 'phase.final_systems_inspections', 'alert-triangle', 10, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]'),
+  ('44444444-4444-4444-4444-444444444411', '22222222-2222-2222-2222-222222222222', 'closeout_handover', 'phase.closeout_handover', 'package', 11, false, true, '["equipe","servicos","maquinarios","materiais","ferramentas","fotos"]')
 ON CONFLICT (template_id, phase_id) DO NOTHING;

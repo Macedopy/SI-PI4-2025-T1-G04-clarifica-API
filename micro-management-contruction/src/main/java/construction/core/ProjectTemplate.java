@@ -10,15 +10,16 @@ import java.util.UUID;
 public class ProjectTemplate extends PanacheEntityBase {
 
     @Id
+    @Column(name = "id")
     private String id;
 
-    @Column(nullable = false)
+    @Column(name = "country_code", nullable = false)
     private String countryCode;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "is_default")
@@ -32,7 +33,6 @@ public class ProjectTemplate extends PanacheEntityBase {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

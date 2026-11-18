@@ -1,10 +1,10 @@
 -- Itens de custo detalhados por fase/atividade
 CREATE TABLE IF NOT EXISTS cost_items (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR(36) PRIMARY KEY,
     phase_id VARCHAR(36) NOT NULL REFERENCES phases(id) ON DELETE CASCADE,
-    activity_id UUID REFERENCES phase_activities(id) ON DELETE SET NULL,
+    activity_id VARCHAR(36) REFERENCES phase_activities(id) ON DELETE SET NULL,
     description VARCHAR(200) NOT NULL,
-    vendor_id UUID,                           -- fornecedor/subcontratado (usuário)
+    vendor_id VARCHAR(36),                           -- fornecedor/subcontratado (usuário)
     budget_amount DECIMAL(15,2) DEFAULT 0,
     committed_amount DECIMAL(15,2) DEFAULT 0,
     invoiced_amount DECIMAL(15,2) DEFAULT 0,
@@ -20,8 +20,8 @@ CREATE INDEX IF NOT EXISTS idx_cost_items_activity ON cost_items(activity_id);
 
 -- Faturas
 CREATE TABLE IF NOT EXISTS invoices (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    cost_item_id UUID NOT NULL REFERENCES cost_items(id) ON DELETE CASCADE,
+    id VARCHAR(36) PRIMARY KEY,
+    cost_item_id VARCHAR(36) NOT NULL REFERENCES cost_items(id) ON DELETE CASCADE,
     invoice_number VARCHAR(100),
     amount DECIMAL(15,2) NOT NULL,
     status VARCHAR(20) DEFAULT 'draft',       -- draft, received, under_review, approved, partially_paid, paid, disputed, void
@@ -34,8 +34,8 @@ CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
 
 -- Pagamentos
 CREATE TABLE IF NOT EXISTS payments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    invoice_id UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+    id VARCHAR(36) PRIMARY KEY,
+    invoice_id VARCHAR(36) NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
     amount DECIMAL(15,2) NOT NULL,
     paid_at TIMESTAMP,
     proof_url TEXT,                           -- comprovante
@@ -46,7 +46,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_invoice ON payments(invoice_id);
 
 -- Change Orders (alterações de escopo/preço/prazo)
 CREATE TABLE IF NOT EXISTS change_orders (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR(36) PRIMARY KEY,
     construction_id VARCHAR(36) NOT NULL REFERENCES constructions(id) ON DELETE CASCADE,
     phase_id VARCHAR(36) REFERENCES phases(id) ON DELETE SET NULL,
     title VARCHAR(200) NOT NULL,

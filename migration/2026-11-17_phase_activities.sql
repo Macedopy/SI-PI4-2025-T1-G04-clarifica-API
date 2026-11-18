@@ -1,6 +1,6 @@
 -- Atividades dentro de cada fase de uma obra (instância do template)
 CREATE TABLE IF NOT EXISTS phase_activities (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR(36) PRIMARY KEY,
     phase_id VARCHAR(36) NOT NULL REFERENCES phases(id) ON DELETE CASCADE,
     activity_id VARCHAR(50) NOT NULL,         -- ID estável: 'foundation_concrete'
     name_key VARCHAR(100) NOT NULL,           -- chave de tradução

@@ -5,7 +5,7 @@ ALTER TABLE constructions ADD COLUMN IF NOT EXISTS measurement_system VARCHAR(20
 ALTER TABLE constructions ADD COLUMN IF NOT EXISTS state_province_code VARCHAR(20);
 ALTER TABLE constructions ADD COLUMN IF NOT EXISTS municipality VARCHAR(100);
 ALTER TABLE constructions ADD COLUMN IF NOT EXISTS construction_method VARCHAR(50);
-ALTER TABLE constructions ADD COLUMN IF NOT EXISTS template_id UUID;
+ALTER TABLE constructions ADD COLUMN IF NOT EXISTS template_id VARCHAR(36);
 ALTER TABLE constructions ADD COLUMN IF NOT EXISTS language VARCHAR(5) DEFAULT 'pt';
 
 -- Adiciona campos de controle financeiro e status na tabela phases

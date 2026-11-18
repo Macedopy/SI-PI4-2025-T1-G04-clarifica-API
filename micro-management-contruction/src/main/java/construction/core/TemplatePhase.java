@@ -10,6 +10,7 @@ import java.util.UUID;
 public class TemplatePhase extends PanacheEntityBase {
 
     @Id
+    @Column(name = "id")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,7 +39,7 @@ public class TemplatePhase extends PanacheEntityBase {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
-    @Column(name = "components", columnDefinition = "JSONB DEFAULT '[]'")
+    @Column(name = "components", columnDefinition = "jsonb")
     private String components;
 
     @Column(name = "created_at")
@@ -49,7 +50,6 @@ public class TemplatePhase extends PanacheEntityBase {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

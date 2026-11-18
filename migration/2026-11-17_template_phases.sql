@@ -1,7 +1,7 @@
 -- Fases de cada template (ID estável independente do nome exibido)
 CREATE TABLE IF NOT EXISTS template_phases (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    template_id UUID NOT NULL REFERENCES project_templates(id) ON DELETE CASCADE,
+    id VARCHAR(36) PRIMARY KEY,
+    template_id VARCHAR(36) NOT NULL REFERENCES project_templates(id) ON DELETE CASCADE,
     phase_id VARCHAR(50) NOT NULL,            -- ID estável: 'foundation', 'framing', etc.
     name_key VARCHAR(100) NOT NULL,           -- chave de tradução: 'phase.foundation'
     icon VARCHAR(50),                         -- ícone lucide padrão

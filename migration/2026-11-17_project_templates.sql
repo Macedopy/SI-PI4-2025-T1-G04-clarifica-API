@@ -1,6 +1,6 @@
 -- Templates de fases por país/jurisdição (ex: Residencial EUA/Canadá, Residencial Brasil)
 CREATE TABLE IF NOT EXISTS project_templates (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR(36) PRIMARY KEY,
     country_code VARCHAR(10) NOT NULL,
     name VARCHAR(100) NOT NULL,
     description TEXT,

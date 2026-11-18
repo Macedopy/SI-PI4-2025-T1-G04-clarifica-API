@@ -3,6 +3,7 @@ package construction.phase;
 import construction.core.Phase;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 public class PhaseActivity extends PanacheEntityBase {
 
     @Id
+    @Column(name = "id")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,7 +42,7 @@ public class PhaseActivity extends PanacheEntityBase {
     private boolean isOptional = false;
 
     @Column(name = "budget_amount", nullable = false)
-    private java.math.BigDecimal budgetAmount = java.math.BigDecimal.ZERO;
+    private BigDecimal budgetAmount = BigDecimal.ZERO;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -50,7 +52,6 @@ public class PhaseActivity extends PanacheEntityBase {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -78,8 +79,8 @@ public class PhaseActivity extends PanacheEntityBase {
     public boolean isOptional() { return isOptional; }
     public void setOptional(boolean isOptional) { this.isOptional = isOptional; }
 
-    public java.math.BigDecimal getBudgetAmount() { return budgetAmount; }
-    public void setBudgetAmount(java.math.BigDecimal budgetAmount) { this.budgetAmount = budgetAmount; }
+    public BigDecimal getBudgetAmount() { return budgetAmount; }
+    public void setBudgetAmount(BigDecimal budgetAmount) { this.budgetAmount = budgetAmount; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
