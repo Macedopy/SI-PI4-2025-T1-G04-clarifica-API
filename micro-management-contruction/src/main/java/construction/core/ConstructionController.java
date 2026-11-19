@@ -101,10 +101,14 @@ public class ConstructionController {
 
         List<Map<String, Object>> result = new ArrayList<>();
         for (Phase phase : phases) {
+            String phaseName = phase.getName();
+            if (phaseName == null || phaseName.isBlank()) {
+                phaseName = "Fase " + phase.getId().substring(0, 8);
+            }
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("id", phase.getId());
-            item.put("nome", phase.getName());
-            item.put("name", phase.getName());
+            item.put("nome", phaseName);
+            item.put("name", phaseName);
             item.put("templatePhaseId", phase.getTemplatePhaseId());
             item.put("contractor", phase.getContractor());
             item.put("icon", phase.getIcon());
