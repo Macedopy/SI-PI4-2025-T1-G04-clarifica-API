@@ -41,9 +41,12 @@ public class ConstructionController {
             }
         }
 
-        // Suportando a criação enviando lista de IDs (como no DTO antigo para compatibilidade)
-        // Mas o DTO novo agora usa UserInfoDTO para saída.
-        // Vou manter a lógica de entrada simples.
+        // Campos de internacionalização e template
+        construction.setTemplateId(dto.getTemplateId());
+        construction.setCountryCode(dto.getCountryCode());
+        construction.setCurrencyCode(dto.getCurrencyCode());
+        construction.setLanguage(dto.getLanguage());
+        construction.setMeasurementSystem(dto.getMeasurementSystem());
 
         construction.persist();
         return Response.status(Response.Status.CREATED).entity(mapToDTO(construction)).build();

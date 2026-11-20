@@ -2,11 +2,13 @@ package construction.phase;
 
 import construction.core.Construction;
 import construction.core.Phase;
+import construction.core.TemplatePhase;
 import construction.user.User;
 import construction.user.UserRole;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
+import java.text.Normalizer;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +37,31 @@ public class PhaseService {
         phase.setIcon(icon);
         phase.setConstruction(construction);
 
+        // Associar ao template_phase se a construção tem template
+        if (construction.getTemplateId() != null) {
+            String normalizedName = normalize(name);
+            TemplatePhase tp = TemplatePhase.find(
+                    "template_id = ?1 AND phase_id = ?2",
+                    construction.getTemplateId(), normalizedName
+            ).firstResult();
+            if (tp != null) {
+                phase.setTemplatePhaseId(tp.getId());
+            }
+        }
+
         phase.persist();
         return phase;
+    }
+
+    private String normalize(String s) {
+        if (s == null) return null;
+        String n = Normalizer.normalize(s, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]", "_")
+                .replaceAll("_+", "_")
+                .replaceAll("^_|_$", "");
+        return n;
     }
 
     public String resolveConstructionId(String idOrUserId) {
